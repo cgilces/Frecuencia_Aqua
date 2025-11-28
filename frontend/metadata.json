@@ -1,0 +1,5 @@
+{
+  "name": "Gestor de Rutas de Clientes",
+  "description": "Una aplicación para cargar y gestionar datos de rutas de clientes, permitiendo la programación de visitas semanales a través de una interfaz interactiva.",
+  "requestFramePermissions": []
+}
