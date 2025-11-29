@@ -1,3 +1,4 @@
+// src/config/baseDatos.js
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 

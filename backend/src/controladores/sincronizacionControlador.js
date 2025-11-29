@@ -1,78 +1,54 @@
-const { loginMovilVendor, enviarRoutes, enviarRouteDetails } = require('../servicios/movilvendorServicio');
-const { guardarRutasDesdePayload, obtenerTodasLasRutas, construirRegistrosRoutes, construirRegistrosRouteDetails } = require('../servicios/rutasServicio');
-const { LogSincronizacion } = require('../modelos');
-const { generarExcelRutas } = require('../servicios/excelServicio');
+// src/controladores/sincronizacionControlador.js
+const { sincronizarMovilVendor } = require('../sincronizadores/movilvendorSincronizador');
 
-async function guardarYSincronizar(req, res) {
+// ===============================================
+//  📌 GUARDAR Y SINCRONIZAR (payload opcional)
+// ===============================================
+exports.guardarYSincronizar = async (req, res) => {
+  console.log("📨 [CTRL SYNC] POST /guardar-y-sincronizar");
+
   try {
-    const { rutas } = req.body;
+    const rutasPayload = Array.isArray(req.body.rutas)
+      ? req.body.rutas
+      : null;
 
-    if (!Array.isArray(rutas) || rutas.length === 0) {
-      return res.status(400).json({ error: 'Debe enviar un arreglo "rutas" con datos.' });
+    if (rutasPayload) {
+      console.log(`📝 [CTRL SYNC] Payload recibido: ${rutasPayload.length} rutas`);
+    } else {
+      console.log("ℹ️ [CTRL SYNC] No se recibió payload. Se usará BD.");
     }
 
-    // Guardar rutas en la base de datos
-    const totalGuardadas = await guardarRutasDesdePayload(rutas);
+    const resultado = await sincronizarMovilVendor({ rutasPayload });
 
-    // Obtener rutas y generar archivo Excel
-    const rutasBD = await obtenerTodasLasRutas();
-    const rutaArchivoExcel = await generarExcelRutas(rutasBD);
+    return res.json(resultado);
 
-    // Realizar login en MovilVendor
-    const sessionId = await loginMovilVendor();
-
-    // Construir registros de rutas y detalles de rutas
-    const registrosRoutes = await construirRegistrosRoutes();
-    const registrosDetalles = await construirRegistrosRouteDetails();
-
-    // Enviar rutas a MovilVendor
-    const respuestaRoutes = await enviarRoutes(sessionId, registrosRoutes);
-    
-    // Enviar detalles de rutas a MovilVendor
-    const respuestaDetalles = await enviarRouteDetails(sessionId, registrosDetalles);
-
-    // Registrar en el log de sincronización
-    await LogSincronizacion.create({
-      rutasEnviadas: registrosRoutes.length,
-      detallesEnviados: registrosDetalles.length,
-      estado: 'OK',
-      mensaje: `Routes: ${JSON.stringify(respuestaRoutes)}, Details: ${JSON.stringify(respuestaDetalles)}`,
-      sessionId
-    });
-
-    // Respuesta final
-    return res.json({
-      mensaje: 'Guardado y sincronización completados correctamente',
-      totalGuardadas,
-      archivoExcel: rutaArchivoExcel,
-      resumenEnvio: {
-        rutasEnviadas: registrosRoutes.length,
-        detallesEnviados: registrosDetalles.length
-      }
-    });
-  } catch (error) {
-    console.error('Error en guardarYSincronizar:', error);
-
-    // Registrar en el log de sincronización si hubo error
-    try {
-      await LogSincronizacion.create({
-        rutasEnviadas: 0,
-        detallesEnviados: 0,
-        estado: 'ERROR',
-        mensaje: error.message,
-        sessionId: null
-      });
-    } catch (e) {
-      console.error('Error al registrar en log_sincronizacion:', e);
-    }
-
+  } catch (err) {
+    console.error("❌ [CTRL SYNC] Error:", err.message);
     return res.status(500).json({
-      error: 'Error al guardar y sincronizar',
-      detalle: error.message
+      ok: false,
+      error: "Error al guardar y sincronizar",
+      detalle: err.message
     });
   }
-}
+};
 
-module.exports = {
-  guardarYSincronizar
+// ===============================================
+//  📌 SINCRONIZAR SOLO DESDE BASE DE DATOS
+// ===============================================
+exports.sincronizarDesdeBD = async (req, res) => {
+  console.log("📨 [CTRL SYNC] GET /solo-sincronizar");
+
+  try {
+    const resultado = await sincronizarMovilVendor({ rutasPayload: null });
+
+    return res.json(resultado);
+
+  } catch (err) {
+    console.error("❌ [CTRL SYNC] Error:", err.message);
+    return res.status(500).json({
+      ok: false,
+      error: "Error al sincronizar desde BD",
+      detalle: err.message
+    });
+  }
 };

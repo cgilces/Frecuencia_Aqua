@@ -5,8 +5,8 @@ const cors = require('cors');
 const { probarConexion } = require('./config/baseDatos');
 
 // Rutas del sistema
-const rutasRutas = require('./rutas/rutasRutas');
-const rutasSincronizacion = require('./rutas/sincronizacionRutas');
+const rutasRutas = require('./rutas/rutasRoutes');
+const rutasSincronizacion = require('./rutas/sincronizacionRoutes');
 const mobilvendorRoutes = require('./rutas/mobilvendorRoutes');
 const login = require('./rutas/loginRoutes');
 const crearUsuario = require('./rutas/usuariosRoutes');
@@ -24,17 +24,18 @@ app.get('/', (req, res) => {
   res.json({ mensaje: 'API de Gestor de Rutas funcionando correctamente 🚀' });
 });
 
-// Registrar rutas
+// Rutas de autenticación / usuarios
 app.use('/api/login', login);
 app.use('/api/usuarios', crearUsuario);
 app.use('/api/usuarios', obtenerUsuarios);
 
-
-// ✔ esta es la sincronización Mobilvendor CORRECTA
+// Rutas específicas MovilVendor (si las usas aparte)
 app.use('/api/mobilvendor', mobilvendorRoutes);
 
-// ✔ rutas del sistema
+// Rutas de gestión de rutas
 app.use('/api/rutas', rutasRutas);
+
+// Rutas de sincronización con MovilVendor
 app.use('/api/sincronizacion', rutasSincronizacion);
 
 // Iniciar servidor

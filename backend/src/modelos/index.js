@@ -8,6 +8,7 @@ const DireccionClienteModel = require("./direcciones_clientes");
 const UsuarioAppModel = require("./UsuarioApp");
 const RutaModel = require("./Ruta");
 const LogSincronizacionModel = require("./LogSincronizacion");
+const RouteDetailModel = require("./RouteDetail");
 
 // Inicialización
 const Cliente = ClienteModel(sequelize, DataTypes);
@@ -15,6 +16,7 @@ const DireccionCliente = DireccionClienteModel(sequelize, DataTypes);
 const UsuarioApp = UsuarioAppModel(sequelize, DataTypes);
 const Ruta = RutaModel(sequelize, DataTypes);
 const LogSincronizacion = LogSincronizacionModel(sequelize, DataTypes);
+const RouteDetail = RouteDetailModel(sequelize, DataTypes);
 
 // Relaciones
 Cliente.hasMany(DireccionCliente, {
@@ -34,4 +36,5 @@ module.exports = {
   UsuarioApp,
   Ruta,
   LogSincronizacion,
+  RouteDetail
 };

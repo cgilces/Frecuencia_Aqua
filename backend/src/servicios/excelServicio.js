@@ -1,14 +1,15 @@
+// src/servicios/excelServicio.js
 const ExcelJS = require('exceljs');
 const fs = require('fs');
 const path = require('path');
 
 async function generarExcelRutas(rutas) {
   try {
-    // Crear un nuevo libro de trabajo (workbook)
+    console.log("📄 [EXCEL] Generando archivo Excel de rutas...");
+
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Rutas');
 
-    // Agregar encabezados a la hoja
     worksheet.columns = [
       { header: 'RUC', key: 'ruc', width: 20 },
       { header: 'Nombre a Mostrar', key: 'nombreMostrar', width: 30 },
@@ -28,7 +29,6 @@ async function generarExcelRutas(rutas) {
       { header: 'Novedad', key: 'novedad', width: 30 },
     ];
 
-    // Llenar las filas con los datos de las rutas
     rutas.forEach((ruta) => {
       worksheet.addRow({
         ruc: ruta.ruc,
@@ -50,21 +50,18 @@ async function generarExcelRutas(rutas) {
       });
     });
 
-    // Asegúrate de que la carpeta 'uploads' existe
     const uploadDir = path.join(__dirname, 'uploads');
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    // Guardar el archivo Excel en el servidor
     const filePath = path.join(uploadDir, `rutas_${Date.now()}.xlsx`);
     await workbook.xlsx.writeFile(filePath);
 
-    console.log(`Archivo Excel generado en: ${filePath}`);
-
-    return filePath; // Retorna la ruta del archivo generado
+    console.log(`✅ [EXCEL] Archivo generado en: ${filePath}`);
+    return filePath;
   } catch (error) {
-    console.error('Error al generar el archivo Excel:', error);
+    console.error('❌ [EXCEL] Error al generar el archivo Excel:', error.message);
     throw new Error('No se pudo generar el archivo Excel.');
   }
 }
