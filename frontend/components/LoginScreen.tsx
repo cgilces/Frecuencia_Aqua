@@ -22,7 +22,7 @@ export const LoginScreen: React.FC = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#162b25] p-4">
-            <Card className="w-full max-w-md p-8 bg-[#BEDACC] border border-[#162b25]/30 text-center shadow-[0_0_20px_rgba(178,225,216,0.1)]">
+            <Card className="w-full max-w-md p-8 bg-[#f2fcf7] border border-[#162b25]/30 text-center shadow-[0_0_20px_rgba(178,225,216,0.1)]">
 
                 <div className="mb-8 flex flex-col items-center">
                     <div className="w-80.5 h-20.5 text-[#b2e1d8] mb-2">
@@ -34,7 +34,7 @@ export const LoginScreen: React.FC = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-6 text-left">
                     <div>
-                        <label className="block text-sm font-medium text-[#b2e1d8] mb-1">Usuario</label>
+                        <label className="block text-sm font-medium text-[#162b25] mb-1">Usuario</label>
                         <Input
                             type="text"
                             value={usuario}
@@ -45,7 +45,7 @@ export const LoginScreen: React.FC = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-[#b2e1d8] mb-1">Contraseña</label>
+                        <label className="block text-sm font-medium text-[#162b25] mb-1">Contraseña</label>
                         <Input
                             type="password"
                             value={clave}
@@ -56,7 +56,7 @@ export const LoginScreen: React.FC = () => {
                     </div>
 
                     {error && (
-                        <div className="bg-red-900/20 border border-red-800 text-red-300 text-sm p-3 rounded">
+                        <div className="bg-red-900/20 border border-red-800 text-red-800 text-sm p-3 rounded">
                             {error}
                         </div>
                     )}
@@ -64,14 +64,14 @@ export const LoginScreen: React.FC = () => {
                     <Button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#b2e1d8] hover:bg-[#9adfd3] disabled:opacity-70 text-[#19322f] font-bold py-3 rounded-lg transition-colors flex justify-center items-center shadow-lg uppercase tracking-wider text-sm"
+                        className="w-full bg-[#b2e1d8] hover:bg-[#9adfd3] disabled:opacity-70 text-[#19322f] border-[#162b25] border font-bold py-3 rounded-lg transition-colors flex justify-center items-center shadow-lg uppercase tracking-wider text-sm"
                     >
                         {loading ? <Spinner /> : 'Iniciar Sesión'}
                     </Button>
                 </form>
 
-                <div className="mt-8 text-xs text-[#162b25]/40">
-                    <p>Sistema interno Grupo Aqua</p>
+                <div className="mt-8 text-xs text-[#162b25]">
+                    <p>DESARROLLADO POR DPTO SISTEMAS - GRUPO AQUA S.A.</p>
                 </div>
             </Card>
         </div>

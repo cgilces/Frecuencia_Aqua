@@ -15,7 +15,7 @@ const MainApp = () => {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-[#BEDACC] text-[#b2e1d8] font-sans">
+      <div className="min-h-screen bg-[#244f43] text-[#b2e1d8] font-sans">
         <Header />
         <main className="p-4 sm:p-6 lg:p-8">
           <Routes>

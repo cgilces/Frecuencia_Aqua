@@ -1,6 +1,7 @@
 import React from 'react';
 import { UploadIcon, CloudIcon, SaveIcon, DatabaseIcon } from '../common/Icons';
 import Button from './Button';
+import Input from './Input';
 
 interface PanelButtonsProps {
     title?: string;
@@ -54,12 +55,12 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                 </div>
 
                 {/* Action Buttons - uniform size, responsive */}
-                <div className="flex flex-col sm:flex-row items-center gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full md:w-auto">
                     {handleFileUpload && (
-                        <label className="flex items-center justify-center gap-2 cursor-pointer bg-[#b2e1d8] hover:bg-[#9adfd3] text-[#19322f] font-bold rounded-lg h-8 px-3 text-sm w-full sm:w-auto min-w-[130px] shadow-sm transition-colors">
-                            <UploadIcon className="w-4 h-4" />
+                        <label className="bg-[#BEDACC] hover:bg-[#9adfd3] disabled:opacity-70 text-[#19322f] font-bold rounded-lg transition-colors flex justify-center items-center shadow-lg uppercase tracking-wider text-xs w-full h-8 gap-2 cursor-pointer">
+                            <UploadIcon className="w-3 h-3" />
                             Importar Excel
-                            <input type="file" className="hidden" onChange={handleFileUpload} accept=".xlsx,.csv" />
+                            <Input type="file" onChange={handleFileUpload} accept=".xlsx,.csv" value={''} />
                         </label>
                     )}
 
@@ -67,9 +68,9 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                         <Button
                             onClick={cargarDesdeBD}
                             color="claroaqua"
-                            className="flex items-center justify-center gap-2 bg-[#b2e1d8]/20 hover:bg-[#b2e1d8]/30 text-[#b2e1d8] rounded-lg h-8 px-3 text-sm w-full sm:w-auto min-w-[130px] transition-colors"
+                            className="w-full h-8 gap-2 text-xs"
                         >
-                            <DatabaseIcon className="w-4 h-4" />
+                            <DatabaseIcon className="w-3 h-3" />
                             {title ? 'Recargar Usuarios' : 'Recargar BD'}
                         </Button>
                     )}
@@ -78,9 +79,9 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                         <Button
                             onClick={handleApiSync}
                             color="claroaqua"
-                            className="flex items-center justify-center gap-2  border border-[#b2e1d8]/50 hover:border-[#b2e1d8] text-[#b2e1d8] rounded-lg h-8 px-3 text-sm w-full sm:w-auto min-w-[130px] transition-colors"
+                            className="w-full h-8 gap-2 text-xs"
                         >
-                            <CloudIcon className="w-4 h-4" />
+                            <CloudIcon className="w-3 h-3" />
                             Sincronizar API
                         </Button>
                     )}
@@ -89,17 +90,19 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                         <Button
                             onClick={handleSaveToDatabase}
                             color="claroaqua"
-                            className="flex items-center justify-center gap-2 bg-[#b2e1d8] hover:bg-[#9adfd3] text-[#19322f] font-bold rounded-lg h-8 px-3 text-sm w-full sm:w-auto min-w-[130px] shadow-sm transition-colors"
+                            className="w-full h-8 gap-2 text-xs"
                         >
-                            <SaveIcon className="w-4 h-4" />
+                            <SaveIcon className="w-3 h-3" />
                             {title ? 'Guardar Cambios' : 'Guardar BD'}
                         </Button>
                     )}
 
                     {itemCount !== undefined && (
-                        <span className="text-[#b2e1d8]/60 text-sm whitespace-nowrap">
-                            {itemCount} {itemLabel}
-                        </span>
+                        <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex justify-center md:justify-end">
+                            <span className="text-[#b2e1d8]/60 text-xs whitespace-nowrap px-2">
+                                {itemCount} {itemLabel}
+                            </span>
+                        </div>
                     )}
                 </div>
             </div>

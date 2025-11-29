@@ -13,6 +13,7 @@ import {
     SaveIcon, CloudIcon, UserAddIcon, DatabaseIcon,
     UploadIcon, DownloadIcon
 } from './common/Icons';
+import Button from './elements/Button';
 
 declare const XLSX: any;
 
@@ -626,7 +627,6 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
                 isAdmin={isAdmin}
                 rutasAsignadas={rutasAsignadas}
                 handleFileUpload={handleFileUpload}
-                cargarDesdeBD={cargarClientesDesdeBD}
                 handleApiSync={handleApiSync}
                 handleSaveToDatabase={handleSaveToDatabase}
                 selectedRoute={selectedRoute}
@@ -663,20 +663,21 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
                             </p>
                         </div>
 
-                        <button
+                        <Button
+                            value="Exportar Excel"
                             onClick={handleDownloadExcel}
                             disabled={generatedSchedule.length === 0}
                             className="bg-[#b2e1d8] hover:bg-[#9adfd3] text-[#19322f] px-4 py-2 rounded-lg font-bold"
                         >
                             <DownloadIcon className="w-5 h-5" />
                             Exportar Excel
-                        </button>
+                        </Button>
                     </div>
 
                     <div className="max-h-96 overflow-y-auto border border-[#b2e1d8]/20 rounded-lg">
                         <table className="w-full text-xs text-[#b2e1d8]/80">
-                            <thead className="bg-[#19322f] sticky top-0 text-[#b2e1d8]/60 uppercase">
-                                <tr>
+                            <thead className="bg-[#19322f] sticky top-0 text-[#b2e1d8]/60 uppercase text-center">
+                                <tr className="text-center">
                                     <th className="px-4 py-2">Ruta</th>
                                     <th className="px-4 py-2">Cliente</th>
                                     <th className="px-4 py-2">Día</th>
@@ -688,19 +689,20 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
                             <tbody>
                                 {generatedSchedule.slice(0, 100).map((row: any) => (
                                     <tr key={row.generatedId} className="hover:bg-[#b2e1d8]/5">
-                                        <td className="px-4 py-2">{row["Ruta"]}</td>
-                                        <td className="px-4 py-2">{row["Cliente (Nombre)"]}</td>
-                                        <td className="px-4 py-2">{row["Día"]}</td>
-                                        <td className="px-4 py-2">{row["Dirección"]}</td>
-                                        <td className="px-4 py-2">{row["Dirección (Descripción)"]}</td>
+                                        <td className="px-4 py-2 text-center">{row["Ruta"]}</td>
+                                        <td className="px-4 py-2 text-center">{row["Cliente (Nombre)"]}</td>
+                                        <td className="px-4 py-2 text-center">{row["Día"]}</td>
+                                        <td className="px-4 py-2 text-center">{row["Dirección"]}</td>
+                                        <td className="px-4 py-2 text-center">{row["Dirección (Descripción)"]}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
                 </Card>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
 
