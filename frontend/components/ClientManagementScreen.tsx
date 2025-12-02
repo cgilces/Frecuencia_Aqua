@@ -502,8 +502,8 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
             header: "Cliente",
             render: (client) => (
                 <>
-                    <div className="font-bold text-[#b2e1d8]">{client.nombre}</div>
-                    <div className="text-xs text-[#b2e1d8]/60">{client.addressDescription}</div>
+                    <div className="font-bold text-[#162b25]">{client.nombre}</div>
+                    <div className="text-xs text-[#162b25]">{client.addressDescription}</div>
                 </>
             )
         },
@@ -525,14 +525,14 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
     ];
 
     const renderMobileItem = (client: DisplayClient) => (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 ">
             <div className="flex justify-between items-start">
                 <div>
-                    <div className="font-bold text-[#b2e1d8] text-lg">{client.nombre}</div>
-                    <div className="text-[#b2e1d8]/60 text-sm">{client.ruc}</div>
+                    <div className="font-bold text-[#162b25] text-lg">{client.nombre}</div>
+                    <div className="text-[#162b25] text-sm">{client.ruc}</div>
                 </div>
                 <div className="text-right">
-                    <div className="text-[#b2e1d8] font-medium">{client.ruta}</div>
+                    <div className="text-[#162b25] font-medium">{client.ruta}</div>
                     {client.inactivo && (
                         <span className="text-red-400 text-xs font-bold px-2 py-0.5 bg-red-400/10 rounded-full">
                             INACTIVO
@@ -541,15 +541,15 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
                 </div>
             </div>
 
-            <div className="text-sm text-[#b2e1d8]/80">
+            <div className="text-sm text-[#162b25]">
                 {client.addressDescription}
             </div>
 
             {/* Selector de Patrones Móvil */}
             <div className="mt-4 mb-2">
-                <label className="block text-xs font-medium text-[#b2e1d8]/60 mb-1">Asignar Días de Visita</label>
+                <label className="block text-xs font-medium text-[#162b25] mb-1">Asignar Días de Visita</label>
                 <select
-                    className="w-full bg-[#19322f] border border-[#b2e1d8]/30 text-[#b2e1d8] rounded-lg text-sm p-2 focus:ring-1 focus:ring-[#b2e1d8] outline-none"
+                    className="w-full bg-[#16] border border-[#162b25]/30 text-[#162b25] rounded-lg text-sm p-2 focus:ring-1 focus:ring-[#162b25] outline-none"
                     value={getClientPattern(client)}
                     onChange={(e) => handlePatternChange(client.id, e.target.value)}
                 >
@@ -569,7 +569,7 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
                 </select>
             </div>
 
-            <div className="flex justify-between items-center mt-3 pt-2 border-t border-[#b2e1d8]/10">
+            <div className="flex justify-between items-center mt-3 pt-2 border-t border-[#162b25]/10">
                 {/* Indicadores Visuales de Días */}
                 <div className="flex gap-1.5">
                     {(['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'] as const).map((day) => (
@@ -578,8 +578,8 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
                             onClick={() => !client.inactivo && toggleDay(client.ruc, day)}
                             disabled={client.inactivo}
                             className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors border ${client.days?.[day]
-                                ? 'bg-[#b2e1d8] text-[#19322f] border-[#b2e1d8]'
-                                : 'bg-transparent text-[#b2e1d8]/30 border-[#b2e1d8]/10'
+                                ? 'bg-[#b2e1d8] text-[#19322f] border-[#162b25]'
+                                : 'bg-transparent text-[#162b25] border-[#b2e1d8]/10'
                                 }`}
                         >
                             {day.charAt(0).toUpperCase()}
@@ -623,18 +623,21 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
 
 
 
+
+
             <PanelButtons
-                isAdmin={isAdmin}
-                rutasAsignadas={rutasAsignadas}
+                title="Gestión de Rutas"
+                subtitle="Administración centralizada de asignaciones"
+                isAdmin={true}
                 handleFileUpload={handleFileUpload}
                 handleApiSync={handleApiSync}
                 handleSaveToDatabase={handleSaveToDatabase}
+                itemCount={filteredClients.length}
+                itemLabel={filteredClients.length === 1 ? 'cliente' : 'clientes'}
+                uniqueRoutes={uniqueRoutes}
                 selectedRoute={selectedRoute}
                 setSelectedRoute={setSelectedRoute}
                 setCurrentPage={setCurrentPage}
-                uniqueRoutes={uniqueRoutes}
-                itemCount={filteredClients.length}
-                itemLabel={filteredClients.length === 1 ? 'cliente' : 'clientes'}
             />
 
             {/* ======================= TABLA PRINCIPAL ======================= */}
@@ -655,10 +658,10 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
 
                     <div className="flex justify-between mb-4">
                         <div>
-                            <h2 className="text-lg text-[#b2e1d8] font-bold">
+                            <h2 className="text-lg text-[#162b25] font-bold">
                                 Planilla Generada {selectedRoute && `(Ruta ${selectedRoute})`}
                             </h2>
-                            <p className="text-sm text-[#b2e1d8]/60">
+                            <p className="text-sm text-[#162b25]/60">
                                 Registros: {generatedSchedule.length}
                             </p>
                         </div>
@@ -674,9 +677,9 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
                         </Button>
                     </div>
 
-                    <div className="max-h-96 overflow-y-auto border border-[#b2e1d8]/20 rounded-lg">
+                    <div className="max-h-96 overflow-y-auto border border-[#162b25]/40 rounded-lg">
                         <table className="w-full text-xs text-[#b2e1d8]/80">
-                            <thead className="bg-[#19322f] sticky top-0 text-[#b2e1d8]/60 uppercase text-center">
+                            <thead className="bg-[#ffffff]  border-[#162b25] border-b-2 sticky top-0 text-[#162b25] uppercase text-center">
                                 <tr className="text-center">
                                     <th className="px-4 py-2">Ruta</th>
                                     <th className="px-4 py-2">Cliente</th>
@@ -688,7 +691,7 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
 
                             <tbody>
                                 {generatedSchedule.slice(0, 100).map((row: any) => (
-                                    <tr key={row.generatedId} className="hover:bg-[#b2e1d8]/5">
+                                    <tr key={row.generatedId} className="hover:bg-[#b2e1d8]/5 border-[#162b25]/40 font-medium text-[#162b25]/80">
                                         <td className="px-4 py-2 text-center">{row["Ruta"]}</td>
                                         <td className="px-4 py-2 text-center">{row["Cliente (Nombre)"]}</td>
                                         <td className="px-4 py-2 text-center">{row["Día"]}</td>

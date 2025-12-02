@@ -1,7 +1,6 @@
 import React from 'react';
-import { UploadIcon, CloudIcon, SaveIcon, DatabaseIcon } from '../common/Icons';
+import { UploadIcon, CloudIcon, SaveIcon, DatabaseIcon, RefreshIcon } from '../common/Icons';
 import Button from './Button';
-import Input from './Input';
 
 interface PanelButtonsProps {
     title?: string;
@@ -37,40 +36,57 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
     itemLabel = 'items',
 }) => {
     return (
-        <div className="flex flex-col gap-4 bg-[#162b25] p-4 rounded-xl shadow-sm border border-[#b2e1d8]/20">
+        <div className="flex flex-col gap-4 bg-[#ffffff] p-6 rounded-xl shadow-lg border border-gray-300 w-full">
             {/* Header Row */}
-            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+            <div className="flex flex-col xl:flex-row gap-6 items-start xl:items-center justify-between">
                 {/* Title / Admin Info */}
-                <div>
+                <div className="min-w-[200px]">
                     {title ? (
                         <>
-                            <h1 className="text-2xl font-bold text-[#b2e1d8]">{title}</h1>
-                            {subtitle && <p className="text-[#b2e1d8]/60 text-sm">{subtitle}</p>}
+                            <h1 className="text-2xl font-bold text-[#162b25]">{title}</h1>
+                            {subtitle && <p className="text-[#162b25]/60 text-sm">{subtitle}</p>}
                         </>
                     ) : (
-                        <div className="text-[#b2e1d8] font-semibold text-sm">
+                        <div className="text-[#162b25] font-semibold text-sm">
                             {isAdmin ? 'Vista de administrador' : `Ruta asignada: ${rutasAsignadas?.[0] ?? 'N/A'}`}
                         </div>
                     )}
                 </div>
 
-                {/* Action Buttons - uniform size, responsive */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full md:w-auto">
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-3 items-center w-full xl:w-auto">
                     {handleFileUpload && (
-                        <label className="bg-[#BEDACC] hover:bg-[#9adfd3] disabled:opacity-70 text-[#19322f] font-bold rounded-lg transition-colors flex justify-center items-center shadow-lg uppercase tracking-wider text-xs w-full h-8 gap-2 cursor-pointer">
-                            <UploadIcon className="w-3 h-3" />
-                            Importar Excel
-                            <Input type="file" onChange={handleFileUpload} accept=".xlsx,.csv" value={''} />
-                        </label>
+                        <>
+                            {/* Input Oculto */}
+                            <input
+                                type="file"
+                                id="file-upload-panel"
+                                className="hidden"
+                                onChange={handleFileUpload}
+                            />
+
+                            {/* Label que parece Botón */}
+                            <Button
+                                as="label"
+                                htmlFor="file-upload-panel"
+                                variant="verdeclaroaqua"
+                                size="sm"
+                                icon={<UploadIcon className="w-3 h-3" />}
+                                className="w-full sm:w-48 h-12 border-[#b2e1d8] text-[#b2e1d8] hover:bg-[#b2e1d8]/10"
+                            >
+                                Subir
+                            </Button>
+                        </>
                     )}
 
                     {cargarDesdeBD && (
                         <Button
                             onClick={cargarDesdeBD}
-                            color="claroaqua"
-                            className="w-full h-8 gap-2 text-xs"
+                            variant="claroaqua"
+                            size="sm"
+                            className="w-full sm:w-48 h-12"
+                            icon={<DatabaseIcon className="w-3 h-3" />}
                         >
-                            <DatabaseIcon className="w-3 h-3" />
                             {title ? 'Recargar Usuarios' : 'Recargar BD'}
                         </Button>
                     )}
@@ -78,53 +94,61 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                     {handleApiSync && (
                         <Button
                             onClick={handleApiSync}
-                            color="claroaqua"
-                            className="w-full h-8 gap-2 text-xs"
+                            variant="claroaqua"
+                            size="sm"
+                            className="w-full sm:w-48 h-12 shadow-md border border-[#b2e1d8]"
+                            icon={<RefreshIcon className="w-3 h-3" />}
                         >
-                            <CloudIcon className="w-3 h-3" />
                             Sincronizar API
                         </Button>
                     )}
 
                     {handleSaveToDatabase && (
                         <Button
+                            variant="verdeaqua"
+                            icon={<SaveIcon className="w-5 h-5" />}
                             onClick={handleSaveToDatabase}
-                            color="claroaqua"
-                            className="w-full h-8 gap-2 text-xs"
+                            size="sm"
+                            className="w-full sm:w-48 h-12 shadow-md border border-[#b2e1d8]/20"
                         >
-                            <SaveIcon className="w-3 h-3" />
-                            {title ? 'Guardar Cambios' : 'Guardar BD'}
+                            Guardar
                         </Button>
                     )}
-
-                    {itemCount !== undefined && (
-                        <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex justify-center md:justify-end">
-                            <span className="text-[#b2e1d8]/60 text-xs whitespace-nowrap px-2">
-                                {itemCount} {itemLabel}
-                            </span>
-                        </div>
-                    )}
                 </div>
+
+                {itemCount !== undefined && (
+                    <div className="flex-shrink-0">
+                        <span className="text-[#b2e1d8]/60 text-xs font-mono px-3 py-1 bg-[#0f1f1b] rounded-full border border-[#b2e1d8]/10">
+                            {itemCount} {itemLabel}
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Filter Row (only for Clientes) */}
             {uniqueRoutes && selectedRoute !== undefined && setSelectedRoute && (
-                <div className="flex items-center gap-3 pt-2 border-t border-[#b2e1d8]/10">
-                    <select
-                        value={selectedRoute}
-                        onChange={e => {
-                            setSelectedRoute(e.target.value);
-                            if (setCurrentPage) setCurrentPage(1);
-                        }}
-                        className="bg-[#19322f] border border-[#b2e1d8]/30 text-[#b2e1d8] text-sm rounded-lg px-3 py-2"
-                    >
-                        <option value="">Todas</option>
-                        {uniqueRoutes.map(r => (
-                            <option key={r} value={r}>
-                                Ruta {r}
-                            </option>
-                        ))}
-                    </select>
+                <div className="flex items-center gap-3 pt-4 border-t border-[#b2e1d8]/10 mt-2">
+                    <label className="text-[#162b25] text-sm font-medium">Filtrar por Ruta:</label>
+                    <div className="relative">
+                        <select
+                            value={selectedRoute}
+                            onChange={e => {
+                                setSelectedRoute(e.target.value);
+                                if (setCurrentPage) setCurrentPage(1);
+                            }}
+                            className="bg-[#0f1f1b] hover:bg-[#0f1f1b]/80 border border-[#b2e1d8]/30 text-[#b6c6c1] text-sm rounded-lg pl-3 pr-8 py-2 appearance-none focus:outline-none focus:ring-1 focus:ring-[#b2e1d8]"
+                        >
+                            <option value="">Todas las rutas</option>
+                            {uniqueRoutes.map(r => (
+                                <option key={r} value={r}>
+                                    Ruta {r}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#b2e1d8]">
+                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

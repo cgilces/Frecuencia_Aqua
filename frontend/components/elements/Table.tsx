@@ -36,7 +36,7 @@ export const Table = <T extends any>({
     renderMobileItem
 }: TableProps<T>) => {
     return (
-        <Card className="overflow-hidden bg-[#19322f] border-[#b2e1d8]/20">
+        <Card className="overflow-hidden bg-[#ffffff] border-[#162b25]/30 shadow-[#162b25]/30">
             {/* VISTA MÓVIL */}
             <div className="md:hidden divide-y divide-[#b2e1d8]/10">
                 {renderMobileItem && data.map((item) => (
@@ -47,9 +47,9 @@ export const Table = <T extends any>({
             </div>
 
             {/* VISTA DE ESCRITORIO */}
-            <div className="overflow-x-auto hidden md:block">
-                <table className="w-full text-sm text-left text-[#b2e1d8]">
-                    <thead className="text-xs text-[#b2e1d8]/60 uppercase bg-[#19322f] border-b border-[#b2e1d8]/20 sticky top-0">
+            <div className="overflow-x-auto hidden md:block  ">
+                <table className="w-full text-sm text-left text-[#b2e1d8] ">
+                    <thead className="text-xs text-[#162b25] uppercase bg-[#ffffff] border-b border-[#162b25]/40 sticky top-0">
                         <tr>
                             {columns.map((col, index) => (
                                 <th key={index} className={`px-6 py-3 ${col.headerClassName || ''}`}>
@@ -59,9 +59,9 @@ export const Table = <T extends any>({
                         </tr>
                     </thead>
 
-                    <tbody className="divide-y divide-[#b2e1d8]/10">
+                    <tbody className="divide-y divide-[#162b25]/30 text-[#162b25]">
                         {data.map((item) => (
-                            <tr key={keyExtractor(item)} className="hover:bg-[#b2e1d8]/5 transition-colors">
+                            <tr key={keyExtractor(item)} className="hover:bg-[#b2e1d8]/5 transition-colors ">
                                 {columns.map((col, index) => (
                                     <td key={index} className={`px-6 py-4 ${col.className || ''}`}>
                                         {col.render
