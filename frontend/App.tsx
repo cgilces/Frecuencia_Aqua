@@ -32,9 +32,9 @@ const MainApp = () => {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-[#ffffff] text-[#b2e1d8] font-sans">
+      <div className="min-h-screen bg-[#ffffff] text-[#b2e1d8] font-sans overflow-x-hidden max-w-full">
         <Header />
-        <main className="p-4 sm:p-6 lg:p-8">
+        <main className="p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
           <Routes>
             <Route path="/" element={<ClientManagementScreen user={user} />} />
             <Route

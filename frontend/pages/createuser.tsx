@@ -177,7 +177,7 @@ const CreateUser: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen text-[#b2e1d8] font-sans">
+        <div className="min-h-screen text-[#162a25] font-sans">
             <main className="space-y-6">
 
                 {/* Panel de Botones Unificado */}
@@ -193,8 +193,8 @@ const CreateUser: React.FC = () => {
 
                     {/* Columna Izquierda: Lista de Usuarios (2/3 del ancho) */}
                     <div className="lg:col-span-2 space-y-4">
-                        <Card className="overflow-hidden bg-[#19322f] border-[#b2e1d8]/20">
-                            <div className="p-4 border-b border-[#b2e1d8]/20 flex justify-between items-center">
+                        <Card className="overflow-hidden  border-[#162a25]/30">
+                            <div className="p-4 border-b border-[#162a25]/30 flex justify-between items-center">
                                 <h2 className="text-lg font-semibold text-[#b2e1d8]">Usuarios Registrados</h2>
                                 <div className="relative">
                                     <Input
