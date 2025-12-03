@@ -7,24 +7,30 @@ import { UserAddIcon, ChevronLeftIcon, ChevronRightIcon, editIcon, deleteIcon } 
 import { useAuth } from '../components/auth/AuthContext';
 import { LoginScreen } from '../components/LoginScreen';
 import { Table, Column } from '../components/elements/Table';
+import Modal from '../components/elements/Modal';
 import Input from '@/components/elements/Input';
 import { User } from '../types';
-import { getUsers, putUser } from '../services/users';
+import { getUsers, putUser, editUser, deleteUser } from '../services/users';
 import { Toast } from '@/components/common/Toast';
 
 const CreateUser: React.FC = () => {
     const { user, loading } = useAuth();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [esedicion, setEsedicion] = useState(false);
     const [toast, setToast] = useState<{ show: boolean; message: string; type: 'success' | 'error' }>({
         show: false,
         message: '',
         type: 'success'
     });
     const [role, setRole] = useState('VENDEDOR');
+
+    const [modaleliminacion, setModaleliminacion] = useState(false);
+    const [editingUserId, setEditingUserId] = useState<string | null>(null);
     const [assignedRoutes, setAssignedRoutes] = useState<string[]>([]);
     const [allUsers, setAllUsers] = useState<User[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>('');
+    const [userToDelete, setUserToDelete] = useState<User | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
@@ -52,6 +58,8 @@ const CreateUser: React.FC = () => {
         if (!searchTerm.trim()) {
             return allUsers;
         }
+
+
 
         const term = searchTerm.toLowerCase();
         return allUsers.filter(user => {
@@ -84,40 +92,94 @@ const CreateUser: React.FC = () => {
     }, [searchTerm]);
 
     const handleEditUser = (user: User) => {
+        setEditingUserId(user.id);
         setUsername(user.username);
         setRole(user.role);
+        setPassword('');
         setAssignedRoutes(Array.isArray(user.assigned_routes) ? user.assigned_routes : []);
     };
+    const handleNewUser = () => {
+        setEditingUserId(null);
+        setUsername('');
+        setPassword('');
+        setRole('VENDEDOR');
+        setAssignedRoutes([]);
+    };
 
-    const handleDeleteUser = (user: User) => {
-        //   deleteUser(user.id);
-        cargarUsuariosDesdeBD();
+    // Funciones para manejar el modal de eliminación
+    const openDeleteModal = (user: User) => {
+        setUserToDelete(user);
+        setModaleliminacion(true);
+    };
+
+    const closeModal = () => {
+        setModaleliminacion(false);
+        setUserToDelete(null);
+    };
+
+    const handleDeleteUser = async () => {
+        if (!userToDelete) return;
+
+        try {
+            await deleteUser(userToDelete.id);
+            setToast({ show: true, message: "Usuario eliminado exitosamente", type: 'success' });
+            cargarUsuariosDesdeBD();
+            closeModal();
+        } catch (error) {
+            console.error(error);
+            setToast({ show: true, message: "Error al eliminar el usuario", type: 'error' });
+            closeModal();
+        }
     };
 
     const handleSaveToDatabase = async () => {
-        const payload = {
+        if (!username.trim()) {
+            setToast({ show: true, message: "El nombre de usuario es requerido", type: 'error' });
+            return;
+        }
+
+        if (!editingUserId && !password.trim()) {
+            setToast({ show: true, message: "La contraseña es requerida para nuevos usuarios", type: 'error' });
+            return;
+        }
+
+        const payload: any = {
             usuario: username,
-            clave: password,
             rol: role,
             rutaAsignada: assignedRoutes
         };
 
-        try {
-            await putUser(payload);
-            // Recargar lista
-            cargarUsuariosDesdeBD();
-            setToast({ show: true, message: "Usuario guardado exitosamente", type: 'success' });
+        if (password.trim()) {
+            payload.clave = password;
+        }
 
-            // Limpiar formulario
-            setUsername('');
-            setPassword('');
-            setAssignedRoutes([]);
+        if (editingUserId) {
+            payload.id = editingUserId;
+        }
+
+        try {
+            if (editingUserId) {
+                await editUser(payload);
+            } else {
+                await putUser(payload);
+            }
+            cargarUsuariosDesdeBD();
+            setToast({
+                show: true,
+                message: editingUserId ? "Usuario actualizado exitosamente" : "Usuario creado exitosamente",
+                type: 'success'
+            });
+
+            handleNewUser();
         } catch (error) {
             console.error(error);
-            setToast({ show: true, message: "Error al guardar el usuario", type: 'error' });
+            setToast({
+                show: true,
+                message: editingUserId ? "Error al actualizar el usuario" : "Error al crear el usuario",
+                type: 'error'
+            });
         }
     }
-
     const goToNextPage = () => {
         if (currentPage < totalPages) {
             setCurrentPage(currentPage + 1);
@@ -171,7 +233,7 @@ const CreateUser: React.FC = () => {
 
                     </button>
                     <button
-                        onClick={() => handleDeleteUser(u)}
+                        onClick={() => openDeleteModal(u)}
                         className="text-sm text-[#162b25] font-medium  py-1 px-6 gap-2 flex items-center rounded no-underline"
                     >
                         {deleteIcon({ className: "w-4 h-4" })}
@@ -273,7 +335,7 @@ const CreateUser: React.FC = () => {
                         <Card className="p-6  sticky top-6" color="bg-[#162b25]">
                             <h2 className="text-lg font-bold text-[#b2e1d8] mb-4 flex items-center gap-2">
                                 <UserAddIcon className="w-5 h-5" />
-                                Nuevo Usuario
+                                {editingUserId ? "Editar Usuario" : "Nuevo Usuario"}
                             </h2>
 
                             <form className="space-y-4">
@@ -289,13 +351,15 @@ const CreateUser: React.FC = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-[#b2e1d8] mb-1">Contraseña</label>
+                                    <label className="block text-sm font-medium text-[#b2e1d8] mb-1">
+                                        Contraseña {editingUserId && "(dejar en blanco para mantener la actual)"}
+                                    </label>
                                     <Input
                                         type="password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         className="w-full  border border-[#162b25]/30 rounded-lg p-2.5 text-[#162b25] focus:ring-1 focus:ring-[#b2e1d8] focus:border-[#b2e1d8] outline-none transition-all"
-                                        placeholder="Ingrese una contraseña"
+                                        placeholder={editingUserId ? "Nueva contraseña (opcional)" : "Ingrese una contraseña"}
                                     />
                                 </div>
 
@@ -328,13 +392,20 @@ const CreateUser: React.FC = () => {
                                     <Button
                                         onClick={handleSaveToDatabase}
                                         variant="verdeclaroaqua"
-
                                         className="w-32 h-10 px-4 py-2 rounded-lg"
                                     >
-                                        Guardar
+                                        {editingUserId ? "Actualizar" : "Guardar"}
                                     </Button>
 
-
+                                    {editingUserId && (
+                                        <Button
+                                            onClick={handleNewUser}
+                                            variant="verdeaqua"
+                                            className="w-32 h-10 px-4 py-2 rounded-lg"
+                                        >
+                                            Nuevo
+                                        </Button>
+                                    )}
                                 </div>
                             </form>
                         </Card>
@@ -342,7 +413,41 @@ const CreateUser: React.FC = () => {
 
                 </div>
             </main>
+            {/* Modal de Confirmación de Eliminación */}
+            <Modal
+                isOpen={modaleliminacion}
+                itemToDelete={userToDelete?.username || ''}
+                onClose={closeModal}
+                onConfirm={handleDeleteUser}
+            />
 
+            {/* Global CSS for Animations */}
+            <style dangerouslySetInnerHTML={{
+                __html: `
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.2s ease-out;
+        }
+
+        .animate-slide-up {
+          animation: slide-up 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth easing */
+        }
+      `}} />
             {/* Toast Component */}
             <Toast
                 message={toast.message}

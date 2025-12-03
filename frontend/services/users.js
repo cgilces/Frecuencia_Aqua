@@ -34,3 +34,28 @@ export const getUsers = async (page = 1, limit = 10) => {
         currentPage: page
     };
 }
+
+// /api/usuarios/editar/4
+
+export const editUser = async (payload) => {
+    const res = await fetch("http://localhost:5000/api/usuarios/editar/" + payload.id, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    return data;
+}
+
+// /api/usuarios/eliminar/2
+
+export const deleteUser = async (id) => {
+    const res = await fetch("http://localhost:5000/api/usuarios/eliminar/" + id, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" }
+    });
+
+    const data = await res.json();
+    return data;
+}
