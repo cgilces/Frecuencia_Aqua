@@ -72,7 +72,7 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                                 variant="verdeaqua"
                                 size="sm"
                                 icon={<UploadIcon className="w-3 h-3" />}
-                                className="w-full sm:w-40 h-10 border-[#b2e1d8] text-[#b2e1d8] hover:bg-[#b2e1d8]/10"
+                                className="w-full sm:w-40 h-10 border-[#b2e1d8] text-[#b2e1d8]"
                             >
                                 Subir
                             </Button>
@@ -96,7 +96,7 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                             onClick={handleApiSync}
                             variant="ghost"
                             size="sm"
-                            className="w-full sm:w-40 h-10 shadow-md border border-[#b2e1d8]"
+                            className="w-full sm:w-40 h-10 shadow-md border border-[#453445]/20"
                             icon={<RefreshIcon className="w-3 h-3" />}
                         >
                             Sincronizar API
