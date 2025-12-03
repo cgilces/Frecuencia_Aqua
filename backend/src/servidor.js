@@ -12,6 +12,9 @@ const login = require('./rutas/loginRoutes');
 const crearUsuario = require('./rutas/usuariosRoutes');
 const obtenerUsuarios = require('./rutas/usuariosRoutes');
 
+const movilvendorGetRoutes = require('./rutas/movilvendorGetRoutes');
+
+
 const app = express();
 const puerto = process.env.PUERTO || 5000;
 
@@ -31,6 +34,8 @@ app.use('/api/usuarios', obtenerUsuarios);
 
 // Rutas específicas MovilVendor (si las usas aparte)
 app.use('/api/mobilvendor', mobilvendorRoutes);
+app.use('/api/movilvendor/get', movilvendorGetRoutes);
+
 
 // Rutas de gestión de rutas
 app.use('/api/rutas', rutasRutas);
