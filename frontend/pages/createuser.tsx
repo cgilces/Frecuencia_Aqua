@@ -3,7 +3,7 @@ import { Card } from '../components/common/Card';
 import { Spinner } from '../components/common/Spinner';
 import Button from '../components/elements/Button';
 import PanelButtons from '../components/elements/PanelButtons';
-import { UserAddIcon, ChevronLeftIcon, ChevronRightIcon } from '../components/common/Icons';
+import { UserAddIcon, ChevronLeftIcon, ChevronRightIcon, editIcon, deleteIcon } from '../components/common/Icons';
 import { useAuth } from '../components/auth/AuthContext';
 import { LoginScreen } from '../components/LoginScreen';
 import { Table, Column } from '../components/elements/Table';
@@ -89,6 +89,11 @@ const CreateUser: React.FC = () => {
         setAssignedRoutes(Array.isArray(user.assigned_routes) ? user.assigned_routes : []);
     };
 
+    const handleDeleteUser = (user: User) => {
+        //   deleteUser(user.id);
+        cargarUsuariosDesdeBD();
+    };
+
     const handleSaveToDatabase = async () => {
         const payload = {
             usuario: username,
@@ -147,7 +152,7 @@ const CreateUser: React.FC = () => {
             headerClassName: "text-center",
             className: "text-center",
             render: (u) => (
-                <span className="text-[#b2e1d8]/70">
+                <span className="text-[#162b25]">
                     {Array.isArray(u.assigned_routes) ? u.assigned_routes.join(", ") : u.assigned_routes}
                 </span>
             )
@@ -155,13 +160,27 @@ const CreateUser: React.FC = () => {
         {
             header: "Acciones",
             headerClassName: "text-center",
-            className: "text-center flex justify-center",
+            className: "text-center",
             render: (u) => (
-                <Button onClick={() => handleEditUser(u)} className="text-[#19322f] bg-[#B2E1D8] py-1 px-2 hover:bg-[#9adfd3] mx-1">
-                    Editar
-                </Button>
+                <div className="flex gap-2 justify-center">
+                    <button
+                        onClick={() => handleEditUser(u)}
+                        className="text-sm text-[#162b25] font-medium    py-1 px-6 gap-2 flex items-center rounded no-underline"
+                    >
+                        {editIcon({ className: "w-4 h-4" })}
+
+                    </button>
+                    <button
+                        onClick={() => handleDeleteUser(u)}
+                        className="text-sm text-[#162b25] font-medium  py-1 px-6 gap-2 flex items-center rounded no-underline"
+                    >
+                        {deleteIcon({ className: "w-4 h-4" })}
+
+                    </button>
+                </div>
             )
         }
+
     ];
 
     if (loading) {
@@ -193,16 +212,16 @@ const CreateUser: React.FC = () => {
 
                     {/* Columna Izquierda: Lista de Usuarios (2/3 del ancho) */}
                     <div className="lg:col-span-2 space-y-4">
-                        <Card className="overflow-hidden  border-[#162a25]/30">
-                            <div className="p-4 border-b border-[#162a25]/30 flex justify-between items-center">
-                                <h2 className="text-lg font-semibold text-[#b2e1d8]">Usuarios Registrados</h2>
+                        <Card className="overflow-hidden  ">
+                            <div className="p-4  flex justify-between items-center">
+                                <h2 className="text-lg font-semibold text-[#162a25]">Usuarios Registrados</h2>
                                 <div className="relative">
                                     <Input
                                         type="text"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         placeholder="Buscar usuario..."
-                                        className="bg-[#19322f] border border-[#b2e1d8]/30 text-[#b2e1d8] text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#b2e1d8]"
+                                        className=" border border-[#162a25] text-[#162a25] text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#b2e1d8]"
                                     />
                                 </div>
                             </div>
@@ -210,37 +229,40 @@ const CreateUser: React.FC = () => {
                             <Table
                                 data={paginatedUsers}
                                 columns={userColumns}
+
                                 keyExtractor={(u) => u.id || u.username}
                             />
 
                             {/* Controles de Paginación */}
-                            <div className="p-3 border-t border-[#b2e1d8]/20 flex justify-between items-center">
-                                <span className="text-xs text-[#b2e1d8]/50">
+                            <div className="p-3 border-t border-[#162b25]/20 flex justify-between items-center">
+                                <span className="text-xs text-[#162b25]">
                                     Mostrando {totalUsers > 0 ? ((currentPage - 1) * itemsPerPage) + 1 : 0} - {Math.min(currentPage * itemsPerPage, totalUsers)} de {totalUsers}
                                 </span>
 
                                 <div className="flex items-center gap-2">
-                                    <button
+                                    <Button
                                         onClick={goToPrevPage}
+                                        variant="verdeaqua"
                                         disabled={currentPage === 1}
-                                        className="px-3 py-1.5 bg-[#b2e1d8]/10 hover:bg-[#b2e1d8]/20 text-[#b2e1d8] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+                                        className="px-3 py-1.5 bg-[#162b25] hover:bg-[#162b25]/10 text-[#b2e1d8] rounded-lg disabled:cursor-not-allowed  flex items-center gap-1"
                                     >
                                         <ChevronLeftIcon className="w-4 h-4" />
                                         Anterior
-                                    </button>
+                                    </Button>
 
-                                    <span className="text-sm text-[#b2e1d8]/70 px-3">
+                                    <span className="text-sm text-[#162b25] px-3">
                                         Página {currentPage} de {totalPages || 1}
                                     </span>
 
-                                    <button
+                                    <Button
                                         onClick={goToNextPage}
                                         disabled={currentPage === totalPages || totalPages === 0}
-                                        className="px-3 py-1.5 bg-[#b2e1d8]/10 hover:bg-[#b2e1d8]/20 text-[#b2e1d8] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+                                        variant="verdeaqua"
+                                        className="px-3 py-1.5  hover:bg-[#162b25]/10 text-[#b2e1d8] rounded-lg     flex items-center gap-1"
                                     >
                                         Siguiente
                                         <ChevronRightIcon className="w-4 h-4" />
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         </Card>
@@ -248,7 +270,7 @@ const CreateUser: React.FC = () => {
 
                     {/* Columna Derecha: Formulario de Creación/Edición (1/3 del ancho) */}
                     <div className="lg:col-span-1">
-                        <Card className="p-6 bg-[#19322f] border-[#b2e1d8]/20 sticky top-6">
+                        <Card className="p-6  sticky top-6" color="bg-[#162b25]">
                             <h2 className="text-lg font-bold text-[#b2e1d8] mb-4 flex items-center gap-2">
                                 <UserAddIcon className="w-5 h-5" />
                                 Nuevo Usuario
@@ -256,33 +278,33 @@ const CreateUser: React.FC = () => {
 
                             <form className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-[#b2e1d8]/80 mb-1">Nombre de Usuario</label>
+                                    <label className="block text-sm font-medium text-[#b2e1d8] mb-1">Nombre de Usuario</label>
                                     <Input
                                         type="text"
                                         value={username}
                                         onChange={(e) => setUsername(e.target.value)}
-                                        className="w-full bg-[#19322f] border border-[#b2e1d8]/30 rounded-lg p-2.5 text-[#b2e1d8] focus:ring-1 focus:ring-[#b2e1d8] focus:border-[#b2e1d8] outline-none transition-all"
+                                        className="w-full  border border-[#162b25]/30 rounded-lg p-2.5 text-[#162b25] focus:ring-1 focus:ring-[#b2e1d8] focus:border-[#b2e1d8] outline-none transition-all"
                                         placeholder="Ej: juan.perez"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-[#b2e1d8]/80 mb-1">Contraseña</label>
+                                    <label className="block text-sm font-medium text-[#b2e1d8] mb-1">Contraseña</label>
                                     <Input
                                         type="password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full bg-[#19322f] border border-[#b2e1d8]/30 rounded-lg p-2.5 text-[#b2e1d8] focus:ring-1 focus:ring-[#b2e1d8] focus:border-[#b2e1d8] outline-none transition-all"
+                                        className="w-full  border border-[#162b25]/30 rounded-lg p-2.5 text-[#162b25] focus:ring-1 focus:ring-[#b2e1d8] focus:border-[#b2e1d8] outline-none transition-all"
                                         placeholder="Ingrese una contraseña"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-[#b2e1d8]/80 mb-1">Rol</label>
+                                    <label className="block text-sm font-medium text-[#b2e1d8] mb-1">Rol</label>
                                     <select
                                         value={role}
                                         onChange={(e) => setRole(e.target.value)}
-                                        className="w-full bg-[#19322f] border border-[#b2e1d8]/30 rounded-lg p-2.5 text-[#b2e1d8] focus:ring-1 focus:ring-[#b2e1d8] focus:border-[#b2e1d8] outline-none transition-all"
+                                        className="w-full  rounded-lg p-2.5 text-[#162b25] focus:ring-1 focus:ring-[#b2e1d8] focus:border-[#b2e1d8] outline-none transition-all"
                                     >
                                         <option value="VENDEDOR">Vendedor</option>
                                         <option value="ADMIN">Administrador</option>
@@ -291,12 +313,12 @@ const CreateUser: React.FC = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-[#b2e1d8]/80 mb-1">Rutas Asignadas</label>
+                                    <label className="block text-sm font-medium text-[#b2e1d8] mb-1">Rutas Asignadas</label>
                                     <Input
                                         type="text"
                                         value={assignedRoutes.join(", ")}
                                         onChange={(e) => setAssignedRoutes(e.target.value.split(", ").map(r => r.trim()).filter(r => r))}
-                                        className="w-full bg-[#19322f] border border-[#b2e1d8]/30 rounded-lg p-2.5 text-[#b2e1d8] focus:ring-1 focus:ring-[#b2e1d8] focus:border-[#b2e1d8] outline-none transition-all"
+                                        className="w-full border border-[#162b25]/30 rounded-lg p-2.5 text-[#162b25] focus:ring-1 focus:ring-[#b2e1d8] focus:border-[#b2e1d8] outline-none transition-all"
                                         placeholder="Ej: R1, R2 (separadas por coma)"
                                     />
                                     <p className="text-xs text-[#b2e1d8]/50 mt-1">Separa las rutas con comas</p>
@@ -305,24 +327,14 @@ const CreateUser: React.FC = () => {
                                 <div className="flex justify-center gap-2">
                                     <Button
                                         onClick={handleSaveToDatabase}
-                                        color="claroaqua"
-                                        className="w-32 h-10 px-4 py-2"
+                                        variant="verdeclaroaqua"
+
+                                        className="w-32 h-10 px-4 py-2 rounded-lg"
                                     >
                                         Guardar
                                     </Button>
 
-                                    <Button
-                                        className="w-32 h-10 px-4 py-2"
-                                        onClick={() => {
-                                            setUsername('');
-                                            setPassword('');
-                                            setAssignedRoutes([]);
-                                            setRole('VENDEDOR');
-                                        }}
-                                        color="claroaqua"
-                                    >
-                                        Nuevo
-                                    </Button>
+
                                 </div>
                             </form>
                         </Card>

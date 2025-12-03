@@ -48,7 +48,7 @@ export const Table = <T extends any>({
 
             {/* VISTA DE ESCRITORIO */}
             <div className="overflow-x-auto hidden md:block  ">
-                <table className="w-full text-sm text-left text-[#b2e1d8] ">
+                <table className="w-full text-sm text-left text-[#162b25] ">
                     <thead className="text-xs text-[#162b25] uppercase bg-[#ffffff] border-b border-[#162b25]/40 sticky top-0">
                         <tr>
                             {columns.map((col, index) => (
@@ -61,7 +61,7 @@ export const Table = <T extends any>({
 
                     <tbody className="divide-y divide-[#162b25]/30 text-[#162b25]">
                         {data.map((item) => (
-                            <tr key={keyExtractor(item)} className="hover:bg-[#b2e1d8]/5 transition-colors ">
+                            <tr key={keyExtractor(item)} className="hover:bg-[#162b25]/5 transition-colors ">
                                 {columns.map((col, index) => (
                                     <td key={index} className={`px-6 py-4 ${col.className || ''}`}>
                                         {col.render

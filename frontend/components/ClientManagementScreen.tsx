@@ -654,7 +654,7 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
 
             {/* ======================= PLANILLA EXPORTACIÓN ======================= */}
             {isAdmin && (
-                <Card className="p-6 bg-[#162b25] border-[#b2e1d8]/20">
+                <Card className="p-6  border-[#b2e1d8]/20">
 
                     <div className="flex justify-between mb-4">
                         <div>
