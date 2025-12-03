@@ -8,9 +8,11 @@ interface InputProps {
     placeholder?: string;
     required?: boolean;
     accept?: string;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+    onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
-const Input = ({ type, value, onChange, className, placeholder, required, accept }: InputProps) => {
+const Input = ({ type, value, onChange, className, placeholder, required, accept, onKeyDown, onBlur }: InputProps) => {
     switch (type) {
         case 'file':
             return (

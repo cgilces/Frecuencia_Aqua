@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card } from '../components/common/Card';
 import { Spinner } from '../components/common/Spinner';
 import Button from '../components/elements/Button';
@@ -24,7 +24,7 @@ const CreateUser: React.FC = () => {
         type: 'success'
     });
     const [role, setRole] = useState('VENDEDOR');
-
+    const [tempRoute, setTempRoute] = useState('');
     const [modaleliminacion, setModaleliminacion] = useState(false);
     const [editingUserId, setEditingUserId] = useState<string | null>(null);
     const [assignedRoutes, setAssignedRoutes] = useState<string[]>([]);
@@ -143,10 +143,16 @@ const CreateUser: React.FC = () => {
             return;
         }
 
+        // Limpia rutas antes de enviar
+        const cleanRoutes = assignedRoutes
+            .map(r => r.trim())           // Elimina espacios
+            .filter(r => r.length > 0)    // Elimina vacíos
+            .filter((r, i, arr) => arr.indexOf(r) === i); // Elimina duplicados
+
         const payload: any = {
             usuario: username,
             rol: role,
-            rutaAsignada: assignedRoutes
+            rutasAsignadas: cleanRoutes.join(","),
         };
 
         if (password.trim()) {
@@ -179,7 +185,10 @@ const CreateUser: React.FC = () => {
                 type: 'error'
             });
         }
-    }
+    };
+
+
+
     const goToNextPage = () => {
         if (currentPage < totalPages) {
             setCurrentPage(currentPage + 1);
@@ -378,14 +387,68 @@ const CreateUser: React.FC = () => {
 
                                 <div>
                                     <label className="block text-sm font-medium text-[#b2e1d8] mb-1">Rutas Asignadas</label>
-                                    <Input
-                                        type="text"
-                                        value={assignedRoutes.join(", ")}
-                                        onChange={(e) => setAssignedRoutes(e.target.value.split(", ").map(r => r.trim()).filter(r => r))}
-                                        className="w-full border border-[#162b25]/30 rounded-lg p-2.5 text-[#162b25] focus:ring-1 focus:ring-[#b2e1d8] focus:border-[#b2e1d8] outline-none transition-all"
-                                        placeholder="Ej: R1, R2 (separadas por coma)"
-                                    />
-                                    <p className="text-xs text-[#b2e1d8]/50 mt-1">Separa las rutas con comas</p>
+
+                                    {/* Contenedor de chips */}
+                                    <div className="flex flex-wrap gap-2 mb-2 min-h-[36px]">
+                                        {assignedRoutes.map((route, index) => (
+                                            <div
+                                                key={index}
+                                                className="bg-[#b2e1d8]/20 text-[#b2e1d8] px-2 py-1 rounded flex items-center gap-1"
+                                            >
+                                                {route}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setAssignedRoutes(assignedRoutes.filter((_, i) => i !== index))}
+                                                    className="text-[#b2e1d8] hover:text-white text-xs font-bold"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Campo de entrada con botón */}
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="text"
+                                            value={tempRoute}
+                                            onChange={(e) => setTempRoute(e.target.value)}
+                                            placeholder="Ej: R1"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ',') {
+                                                    e.preventDefault();
+                                                    if (tempRoute.trim() && !assignedRoutes.includes(tempRoute.trim())) {
+                                                        setAssignedRoutes([...assignedRoutes, tempRoute.trim()]);
+                                                        setTempRoute('');
+                                                    }
+                                                }
+                                            }}
+                                            onBlur={() => {
+                                                if (tempRoute.trim() && !assignedRoutes.includes(tempRoute.trim())) {
+                                                    setAssignedRoutes([...assignedRoutes, tempRoute.trim()]);
+                                                    setTempRoute('');
+                                                }
+                                            }}
+                                            className="flex-1 border border-[#162b25]/30 rounded-lg p-2.5 text-[#162b25] focus:ring-1 focus:ring-[#b2e1d8] focus:border-[#b2e1d8] outline-none transition-all"
+                                        />
+                                        <Button
+                                            type="button"
+                                            onClick={() => {
+                                                if (tempRoute.trim() && !assignedRoutes.includes(tempRoute.trim())) {
+                                                    setAssignedRoutes([...assignedRoutes, tempRoute.trim()]);
+                                                    setTempRoute('');
+                                                }
+                                            }}
+                                            variant="verdeaqua"
+                                            className="px-3 py-2 rounded"
+                                        >
+                                            +
+                                        </Button>
+                                    </div>
+
+                                    <p className="text-xs text-[#b2e1d8]/50 mt-1">
+                                        Presiona Enter, coma o el botón "+" para agregar rutas
+                                    </p>
                                 </div>
 
                                 <div className="flex justify-center gap-2">
