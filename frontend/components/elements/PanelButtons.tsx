@@ -54,7 +54,7 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap gap-3 items-center w-full xl:w-auto">
+                <div className="flex flex-wrap gap-3 items-center xl:ml-[20rem] w-full xl:w-auto">
                     {handleFileUpload && (
                         <>
                             {/* Input Oculto */}
@@ -69,10 +69,10 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                             <Button
                                 as="label"
                                 htmlFor="file-upload-panel"
-                                variant="verdeclaroaqua"
+                                variant="verdeaqua"
                                 size="sm"
                                 icon={<UploadIcon className="w-3 h-3" />}
-                                className="w-full sm:w-48 h-12 border-[#b2e1d8] text-[#b2e1d8] hover:bg-[#b2e1d8]/10"
+                                className="w-full sm:w-40 h-10 border-[#b2e1d8] text-[#b2e1d8] hover:bg-[#b2e1d8]/10"
                             >
                                 Subir
                             </Button>
@@ -82,9 +82,9 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                     {cargarDesdeBD && (
                         <Button
                             onClick={cargarDesdeBD}
-                            variant="claroaqua"
+                            variant="ghost"
                             size="sm"
-                            className="w-full sm:w-48 h-12"
+                            className="w-full sm:w-40 h-10"
                             icon={<DatabaseIcon className="w-3 h-3" />}
                         >
                             {title ? 'Recargar Usuarios' : 'Recargar BD'}
@@ -94,9 +94,9 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                     {handleApiSync && (
                         <Button
                             onClick={handleApiSync}
-                            variant="claroaqua"
+                            variant="ghost"
                             size="sm"
-                            className="w-full sm:w-48 h-12 shadow-md border border-[#b2e1d8]"
+                            className="w-full sm:w-40 h-10 shadow-md border border-[#b2e1d8]"
                             icon={<RefreshIcon className="w-3 h-3" />}
                         >
                             Sincronizar API
@@ -109,7 +109,7 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                             icon={<SaveIcon className="w-5 h-5" />}
                             onClick={handleSaveToDatabase}
                             size="sm"
-                            className="w-full sm:w-48 h-12 shadow-md border border-[#b2e1d8]/20"
+                            className="w-full sm:w-40 h-10 shadow-md border border-[#b2e1d8]/20"
                         >
                             Guardar
                         </Button>

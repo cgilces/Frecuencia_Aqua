@@ -65,7 +65,7 @@ const Button: React.FC<ButtonProps> = ({
     const baseStyles = "inline-flex items-center rounded-lg transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-sm";
 
     // Estilos específicos para botones de acción (Botones normales)
-    const actionBase = "justify-center bg-transparent  font-bold uppercase tracking-wider hover:shadow-md active:scale-95";
+    const actionBase = "justify-center   font-bold uppercase tracking-wider hover:shadow-md active:scale-95";
 
     // Estilos específicos para botones tipo Input
     const inputBase = "justify-between font-normal normal-case hover:border-[#9adfd3] hover:ring-1 hover:ring-[#9adfd3] focus:border-[#6baf8e] focus:ring-[#6baf8e] bg-white border border-slate-300 text-slate-700 w-full";
@@ -76,14 +76,14 @@ const Button: React.FC<ButtonProps> = ({
         verdeaqua: `${actionBase} bg-[#162b25] text-white hover:bg-[#2c4f45] focus:ring-[#162b25]`,
         verdeclaroaqua: `${actionBase} bg-[#6baf8e] text-[#19322f] hover:bg-[#5a9e7d] focus:ring-[#6baf8e]`,
         outline: `${actionBase} bg-transparent border-2 border-[#19322f] text-[#19322f] hover:bg-[#BEDACC]/20 focus:ring-[#19322f]`,
-        ghost: `${actionBase} bg-transparent text-[#19322f] hover:bg-[#BEDACC]/30 shadow-none hover:shadow-none focus:ring-[#BEDACC]`,
+        ghost: `${actionBase} bg-transparent text-[#19322f] border-[#19322f]/20 hover:bg-[#BEDACC]/30 shadow-none hover:shadow-none focus:ring-[#BEDACC]`,
         input: inputBase, // Variante estilo input
 
     };
 
     // Ajustes de tamaño
     const sizeStyles = {
-        sm: "px-3 py-1.5 text-xs gap-1.5",
+        sm: "px-2 py-1 text-xs gap-1",
         md: "px-4 py-3 text-sm gap-2",
         lg: "px-6 py-4 text-base gap-3",
         icon: "p-3 aspect-square text-sm justify-center",
