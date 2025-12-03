@@ -1,20 +1,154 @@
--- 1. Crear tabla de usuarios de la aplicación
-CREATE TABLE IF NOT EXISTS public.app_users (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    username text UNIQUE NOT NULL,
-    password text NOT NULL, -- Nota: Para producción real, esto debería estar encriptado.
-    role text NOT NULL CHECK (role IN ('ADMIN', 'VENDEDOR', 'DESPACHADOR')),
-    assigned_routes text[] DEFAULT NULL, -- Array de rutas permitidas ej: ['R1', 'R2']
-    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+------------------------------------------------------------
+-- BASE DE DATOS: planillas_rutas
+-- IMPORTANTE: Crear primero la base:
+  CREATE DATABASE planillas_rutas;
+  \c planillas_rutas;
+------------------------------------------------------------
+
+------------------------------------------------------------
+--  TABLA: clientes
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS clientes (
+    codigo VARCHAR(50) PRIMARY KEY,
+    identificacion VARCHAR(50),
+    nombre VARCHAR(200),
+    nombre_empresa VARCHAR(200),
+    contacto VARCHAR(200),
+    categoria_precio VARCHAR(50),
+    vendedor_asignado VARCHAR(50),
+    estado VARCHAR(50),
+    correo VARCHAR(150),
+    saldo DECIMAL(18,2) DEFAULT 0,
+    fecha_ultima_sincronizacion TIMESTAMP
 );
 
--- 2. Habilitar seguridad
-ALTER TABLE public.app_users ENABLE ROW LEVEL SECURITY;
+CREATE INDEX IF NOT EXISTS idx_clientes_identificacion
+    ON clientes(identificacion);
 
-EATE POLICY "Lectura publica de usuarios" ON public.app_users FOR SELECT TO anon USING (true);
-CREATE POLICY "Escritura publica de usuarios" ON public.app_users FOR INSERT TO anon WITH CHECK (true);
+CREATE INDEX IF NOT EXISTS idx_clientes_vendedor
+    ON clientes(vendedor_asignado);
 
--- 4. Insertar USUARIOS DE PRUEBA (¡Puedes modificarlos!)
+
+------------------------------------------------------------
+--  TABLA: direcciones_clientes
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS direcciones_clientes (
+    codigo TEXT PRIMARY KEY,
+    codigo_cliente TEXT,
+    direccion TEXT,
+    calle_principal TEXT,
+    calle_secundaria TEXT,
+    referencia TEXT,
+    telefono TEXT,
+    fecha_creacion TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_dir_cliente
+    ON direcciones_clientes(codigo_cliente);
+
+
+------------------------------------------------------------
+--  TABLA: log_sincronizacion
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS log_sincronizacion (
+    id SERIAL PRIMARY KEY,
+    fecha TIMESTAMP DEFAULT NOW(),
+    rutas_enviadas INTEGER,
+    detalles_enviados INTEGER,
+    estado TEXT,
+    mensaje TEXT,
+    session_id TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_log_fecha
+    ON log_sincronizacion(fecha);
+
+
+------------------------------------------------------------
+-- 4️⃣ TABLA: route_details
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS route_details (
+    code TEXT PRIMARY KEY,
+    route_code TEXT,
+    customer_code TEXT,
+    customer_address_code TEXT DEFAULT 'PRINCIPAL',
+    week INTEGER DEFAULT 1,
+    sequence INTEGER,
+    day INTEGER
+);
+
+CREATE INDEX IF NOT EXISTS idx_route_details_route
+    ON route_details(route_code);
+
+CREATE INDEX IF NOT EXISTS idx_route_details_customer
+    ON route_details(customer_code);
+
+
+------------------------------------------------------------
+--  TABLA: routes
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS routes (
+    ruc TEXT PRIMARY KEY,
+    nombre_mostrar TEXT,
+    telefono TEXT,
+    categoria TEXT,
+    latitud_geografica TEXT,
+    longitud_geografica TEXT,
+    zona TEXT,
+    ruta TEXT,
+    l BOOLEAN DEFAULT false,
+    m BOOLEAN DEFAULT false,
+    x BOOLEAN DEFAULT false,
+    j BOOLEAN DEFAULT false,
+    v BOOLEAN DEFAULT false,
+    s BOOLEAN DEFAULT false,
+    inactivo BOOLEAN DEFAULT false,
+    novedad TEXT,
+    creado_en TIMESTAMP DEFAULT NOW(),
+    actualizado_en TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_routes_categoria
+    ON routes(categoria);
+
+CREATE INDEX IF NOT EXISTS idx_routes_zona
+    ON routes(zona);
+
+
+------------------------------------------------------------
+-- 6️TABLA: app_users
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS app_users (
+    id SERIAL PRIMARY KEY,
+    usuario TEXT UNIQUE NOT NULL,
+    clave TEXT NOT NULL,
+    rol TEXT CHECK (rol IN ('ADMIN', 'VENDEDOR', 'DESPACHADOR')) NOT NULL,
+    rutas_asignadas TEXT[],
+    creado_en TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_app_users_rol
+    ON app_users(rol);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--. Insertar USUARIOS DE PRUEBA (¡Puedes modificarlos!)
 INSERT INTO public.app_users (username, password, role, assigned_routes)
 VALUES 
     ('admin', '1234', 'ADMIN', NULL),                               
@@ -48,86 +182,4 @@ VALUES
 
 
     -- 1. Crear la tabla 'routes' con las columnas exactas usadas en la App
-CREATE TABLE IF NOT EXISTS public.routes (
-    "RUC" text PRIMARY KEY,
-    "Nombre a Mostrar" text,
-    "Teléfono" text,
-    "Categoria" text,
-    "Latitud geográfica" text,
-    "Longitud geográfica" text,
-    "ZONA" text,
-    "Ruta" text,
-    "L" boolean DEFAULT false,
-    "M" boolean DEFAULT false,
-    "X" boolean DEFAULT false,
-    "J" boolean DEFAULT false,
-    "V" boolean DEFAULT false,
-    "S" boolean DEFAULT false,
-    "INACTIVO" boolean DEFAULT false,
-    "Novedad" text,
-    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
-);
 
--- 2. Habilitar Row Level Security (RLS) es buena práctica en Supabase
-ALTER TABLE public.routes ENABLE ROW LEVEL SECURITY;
-
--- 3. Crear políticas de acceso
--- IMPORTANTE: Como tu app usa la 'anon key' sin un sistema de login de usuarios de Supabase,
--- necesitamos permitir el acceso público (o anónimo) para que el botón 'Guardar' funcione.
-
--- Permitir lectura a todos (anon)
-CREATE POLICY "Permitir lectura publica" 
-ON public.routes FOR SELECT 
-TO anon 
-USING (true);
-
--- Permitir inserción a todos (anon)
-CREATE POLICY "Permitir insercion publica" 
-ON public.routes FOR INSERT 
-TO anon 
-WITH CHECK (true);
-
--- Permitir actualización a todos (anon) basado en el RUC
-CREATE POLICY "Permitir actualizacion publica" 
-ON public.routes FOR UPDATE 
-TO anon 
-USING (true);
-
--- 1. Crear la tabla 'api_addresses' para almacenar direcciones de clientes
-CREATE TABLE IF NOT EXISTS public.api_addresses (
-    code text PRIMARY KEY,
-    customer_code text,
-    address text, -- La descripción de la dirección
-    main_street text, -- Calle principal
-    secondary_street text,
-    reference text,
-    phone text,
-    created_at timestamp with time zone DEFAULT timezone('utc'::text, now())
-);
-
--- Habilitar permisos
-ALTER TABLE public.api_addresses ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Acceso publico api_addresses" ON public.api_addresses FOR ALL TO anon USING (true) WITH CHECK (true);
-
--- 1. Crear la tabla 'api_customers' para almacenar información de clientes
-
-CREATE TABLE IF NOT EXISTS public.api_customers (
-    code text PRIMARY KEY,                 -- Código único del cliente (ej. "108712")
-    identity_ text,                        -- RUC o Cédula (ej. "0917632325")
-    name text,                             -- Nombre Fiscal/Legal
-    company_name text,                     -- Nombre de la Compañía
-    contact text,                          -- Persona de contacto / Teléfono
-    price_list_code_lookup text,           -- Categoría legible (ej. "MINORISTAS PET")
-    user_code_lookup text,                 -- Vendedor asignado (ej. "Cristian Gilces")
-    status text,                           -- Estatus ("1" = Activo)
-    email text,                            -- Correo (si viene en la respuesta)
-    balance numeric DEFAULT 0,             -- Saldo (opcional)
-    last_synced_at timestamp with time zone DEFAULT timezone('utc'::text, now())
-);
-
--- Habilitar seguridad y acceso público (para que la app pueda escribir)
-ALTER TABLE public.api_customers ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Lectura publica api_customers" ON public.api_customers FOR SELECT TO anon USING (true);
-CREATE POLICY "Escritura publica api_customers" ON public.api_customers FOR INSERT TO anon WITH CHECK (true);
-CREATE POLICY "Actualizacion publica api_customers" ON public.api_customers FOR UPDATE TO anon USING (true);
