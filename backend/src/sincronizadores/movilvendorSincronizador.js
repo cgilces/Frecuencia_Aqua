@@ -1,88 +1,119 @@
 // src/sincronizadores/movilvendorSincronizador.js
-const { LogSincronizacion } = require("../modelos");
+
+const {
+  obtenerCliente,
+  crearCliente,
+  obtenerDirecciones,
+  crearDireccionPrincipal,
+  loginMovilVendor,
+  enviarRoutes,
+  enviarRouteDetails
+} = require("../servicios/movilvendorServicio");
 
 const {
   guardarRutasDesdePayload,
   obtenerTodasLasRutas,
   construirRegistrosRoutes,
-  construirRegistrosRouteDetails,
-  prepararClientesYDirecciones,
+  construirRegistrosRouteDetails
 } = require("../servicios/rutasServicio");
 
-const {
-  loginMovilVendor,
-  enviarRoutes,
-  enviarRouteDetails,
-} = require("../servicios/movilvendorServicio");
-
 const { generarExcelRutas } = require("../servicios/excelServicio");
+const { LogSincronizacion } = require("../modelos");
 
+// ======================================================
+// 🔄 SINCRONIZAR COMPLETA
+// ======================================================
 async function sincronizarMovilVendor({ rutasPayload = null } = {}) {
   console.log("🔄 [SYNC] Iniciando sincronización...");
 
   let sessionId = null;
-  let rutasEnviadas = 0;
-  let detallesEnviados = 0;
 
   try {
-    // 1) Guardar rutas si vienen desde frontend
-    if (Array.isArray(rutasPayload) && rutasPayload.length > 0) {
-      console.log("📥 [SYNC] Guardando rutas desde payload...");
+    // 1) Guardar rutas si vienen en payload
+    if (rutasPayload) {
+      console.log("📥 [SYNC] Guardando rutas del payload...");
       await guardarRutasDesdePayload(rutasPayload);
     }
 
-    // 2) Obtener rutas
+    // 2) Rutas desde BD
     const rutasBD = await obtenerTodasLasRutas();
-
-    // 3) Generar Excel
     const excelPath = await generarExcelRutas(rutasBD);
 
-    // 4) Preparar registros
+    // 3) Preparar registros MovilVendor
     const registrosRoutes = await construirRegistrosRoutes();
     const registrosDetalles = await construirRegistrosRouteDetails();
 
-    // 5) Login
+    // 4) Login
     sessionId = await loginMovilVendor();
 
-    // 6) Validación CRÍTICA
-    await prepararClientesYDirecciones(sessionId, registrosDetalles);
+    // ============================================================
+    // 🔥 5) VALIDAR CLIENTES ÚNICOS (YA NO REPETIDO 136 VECES)
+    // ============================================================
+    console.log("👥 [SYNC] Validando clientes únicos...");
 
-    // 7) Enviar routes
+    const clientesUnicos = [...new Set(registrosDetalles.map(d => d.customer_code))];
+
+    console.log(`📌 [SYNC] Total clientes únicos: ${clientesUnicos.length}`);
+
+    for (const code of clientesUnicos) {
+      console.log(`\n👤 [MV] Validando cliente ${code}...`);
+
+      // ¿Existe cliente?
+      const cliente = await obtenerCliente(sessionId, code);
+
+      if (!cliente) {
+        console.log(`➕ [SYNC] Cliente ${code} NO existe. Creando...`);
+        const ok = await crearCliente(sessionId, code, "SIN NOMBRE");
+
+        if (!ok) throw new Error(`Error creando cliente ${code}`);
+      }
+
+      // Validar direcciones
+      const dirs = await obtenerDirecciones(sessionId, code);
+
+      const tienePrincipal = dirs?.some(d => d.code === "PRINCIPAL");
+
+      if (!tienePrincipal) {
+        console.log(`➕ [SYNC] Cliente ${code} sin dirección PRINCIPAL. Creando...`);
+        const ok = await crearDireccionPrincipal(sessionId, code);
+
+        if (!ok) throw new Error(`Error creando dirección PRINCIPAL para cliente ${code}`);
+      }
+
+      console.log(`✔ [SYNC] Cliente ${code} validado.`);
+    }
+
+    // 6) Enviar schema routes
     await enviarRoutes(sessionId, registrosRoutes);
 
-    // 8) Enviar route_details
+    // 7) Enviar schema route_details
     await enviarRouteDetails(sessionId, registrosDetalles);
 
-    // 9) Log OK
+    // 8) Log de éxito
     await LogSincronizacion.create({
       rutasEnviadas: registrosRoutes.length,
       detallesEnviados: registrosDetalles.length,
       estado: "OK",
       mensaje: "Sincronización exitosa",
-      sessionId,
+      sessionId
     });
 
     return {
       ok: true,
-      mensaje: "Sincronización completada correctamente",
-      archivoExcel: excelPath,
-      resumenEnvio: {
-        rutasEnviadas: registrosRoutes.length,
-        detallesEnviados: registrosDetalles.length,
-      },
+      mensaje: "Sincronización completa",
+      archivoExcel: excelPath
     };
-  } catch (error) {
-    console.error("❌ [SYNC] ERROR:", error.message);
+
+  } catch (err) {
+    console.error("❌ [SYNC] ERROR:", err.message);
 
     await LogSincronizacion.create({
       estado: "ERROR",
-      mensaje: error.message,
-      rutasEnviadas,
-      detallesEnviados,
-      sessionId,
+      mensaje: err.message,
+      sessionId
     });
 
-    throw error;
+    throw err;
   }
 }
 

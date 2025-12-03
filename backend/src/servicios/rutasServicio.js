@@ -1,35 +1,34 @@
 // src/servicios/rutasServicio.js
-const {
-  obtenerCliente,
-  crearCliente,
-  obtenerDirecciones,
-  crearDireccionPrincipal,
-} = require("./movilvendorServicio");
 const { Ruta } = require("../modelos");
 
-// ========================================================
-// VALIDAR RUTA LOCAL
-// ========================================================
+// ===================================================
+// 🔍 Validar ruta
+// ===================================================
 function validarRuta(dato) {
   const errores = [];
-  const ruc = dato["RUC"];
-  const nombre = dato["Nombre a Mostrar"];
-  const ruta = dato["Ruta"];
 
-  if (!ruc || !/^\d{9,13}$/.test(ruc)) {
-    errores.push(`RUC inválido: "${ruc}"`);
+  if (!dato["RUC"] || !/^\d{9,13}$/.test(dato["RUC"])) {
+    errores.push("RUC inválido");
   }
-  if (!nombre) errores.push("El campo 'Nombre a Mostrar' está vacío.");
-  if (!ruta) errores.push("El campo 'Ruta' está vacío.");
 
-  if (errores.length > 0) throw new Error(errores.join(" | "));
+  if (!dato["Nombre a Mostrar"]) {
+    errores.push("Nombre vacío");
+  }
+
+  if (!dato["Ruta"]) {
+    errores.push("Ruta vacía");
+  }
+
+  if (errores.length > 0) {
+    throw new Error(errores.join(" | "));
+  }
 }
 
-// ========================================================
-// GUARDAR RUTAS EN BD
-// ========================================================
+// ===================================================
+// 💾 Guardar rutas
+// ===================================================
 async function guardarRutasDesdePayload(lista) {
-  console.log("🚀 [RUTAS] Guardando rutas...");
+  console.log("💾 [RUTAS] Guardando rutas recibidas...");
 
   let total = 0;
 
@@ -53,118 +52,81 @@ async function guardarRutasDesdePayload(lista) {
         v: !!dato["V"],
         s: !!dato["S"],
         inactivo: !!dato["INACTIVO"],
-        novedad: dato["Novedad"] || null,
+        novedad: dato["Novedad"] || null
       });
 
       total++;
-    } catch (e) {
-      console.error(`❌ [RUTAS] Error con RUC ${dato["RUC"]}:`, e.message);
+    } catch (err) {
+      console.error("❌ [RUTAS] Error guardando:", err.message);
     }
   }
 
-  console.log(`✔ [RUTAS] ${total} registros guardados.`);
+  console.log(`✔ [RUTAS] Total guardadas: ${total}`);
   return total;
 }
 
-// ========================================================
-// OBTENER TODAS LAS RUTAS
-// ========================================================
+// ===================================================
+// 📥 Obtener todas
+// ===================================================
 async function obtenerTodasLasRutas() {
   return Ruta.findAll({
-    order: [
-      ["ruta", "ASC"],
-      ["nombreMostrar", "ASC"],
-    ],
+    order: [["ruta", "ASC"], ["nombreMostrar", "ASC"]]
   });
 }
 
-// ========================================================
-// ROUTES PARA MOVILVENDOR
-// ========================================================
+// ===================================================
+// 🧱 Construir routes
+// ===================================================
 async function construirRegistrosRoutes() {
   const rutas = await Ruta.findAll({
     attributes: ["ruta"],
-    group: ["ruta"],
+    group: ["ruta"]
   });
 
-  return rutas.map((r) => ({
+  return rutas.map(r => ({
     code: r.ruta,
-    description: r.ruta,
+    description: r.ruta
   }));
 }
 
-// ========================================================
-// ROUTE_DETAILS PARA MOVILVENDOR
-// ========================================================
+// ===================================================
+// 🧱 Construir route_details
+// ===================================================
 async function construirRegistrosRouteDetails() {
   const rutas = await Ruta.findAll();
   const registros = [];
-  let sec = 1;
 
-  const dias = [
-    { campo: "l", diaNumero: 2 },
-    { campo: "m", diaNumero: 3 },
-    { campo: "x", diaNumero: 4 },
-    { campo: "j", diaNumero: 5 },
-    { campo: "v", diaNumero: 6 },
-    { campo: "s", diaNumero: 7 },
-  ];
+  let i = 1;
 
   for (const r of rutas) {
-    dias.forEach((d) => {
-      if (r[d.campo]) {
+    const dias = [
+      { flag: r.l, d: 2 },
+      { flag: r.m, d: 3 },
+      { flag: r.x, d: 4 },
+      { flag: r.j, d: 5 },
+      { flag: r.v, d: 6 },
+      { flag: r.s, d: 7 }
+    ];
+
+    for (const d of dias) {
+      if (d.flag) {
         registros.push({
-          code: `${r.ruta}-${r.ruc}-${d.diaNumero}-${sec}`,
+          code: `${r.ruta}-${r.ruc}-${d.d}-${i}`,
           route_code: r.ruta,
           customer_code: r.ruc,
           description: r.nombreMostrar,
           customer_address_code: "PRINCIPAL",
           week: 1,
-          sequence: sec,
-          day: d.diaNumero,
+          sequence: i,
+          day: d.d
         });
-        sec++;
+
+        i++;
       }
-    });
+    }
   }
 
   return registros;
-}
-
-// ========================================================
-// VALIDAR CLIENTES Y DIRECCIONES EN MOVILVENDOR
-// ========================================================
-async function prepararClientesYDirecciones(sessionId, registrosDetalles) {
-  console.log("🔍 [MV] Validando clientes y direcciones...");
-
-  for (const det of registrosDetalles) {
-    const customerCode = det.customer_code;
-
-    console.log(`\n👤 [MV] Cliente: ${customerCode}`);
-
-    // 1) Validar cliente
-    const cliente = await obtenerCliente(sessionId, customerCode);
-
-    if (!cliente || cliente.total === 0) {
-      console.log(`⚠ [MV] Cliente ${customerCode} no existe. Se creará.`);
-      await crearCliente(sessionId, customerCode, det.description);
-    } else {
-      console.log(`✔ [MV] Cliente ${customerCode} OK`);
-    }
-
-    // 2) Validar direcciones
-    const direcciones = await obtenerDirecciones(sessionId, customerCode);
-
-    if (!direcciones || direcciones.total === 0) {
-      console.log(`⚠ [MV] Cliente ${customerCode} no tiene direcciones. Creando PRINCIPAL...`);
-      await crearDireccionPrincipal(sessionId, customerCode);
-    }
-
-    det.customer_address_code = "PRINCIPAL"; // 🔥 obligatorio
-    det.week = 1;
-  }
-
-  console.log("\n✔ [MV] Validación completada.");
 }
 
 module.exports = {
@@ -172,6 +134,5 @@ module.exports = {
   guardarRutasDesdePayload,
   obtenerTodasLasRutas,
   construirRegistrosRoutes,
-  construirRegistrosRouteDetails,
-  prepararClientesYDirecciones,
+  construirRegistrosRouteDetails
 };
