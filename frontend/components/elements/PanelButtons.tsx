@@ -1,5 +1,5 @@
 import React from 'react';
-import { UploadIcon, CloudIcon, SaveIcon, DatabaseIcon, RefreshIcon } from '../common/Icons';
+import { UploadIcon, CloudIcon, SaveIcon, DatabaseIcon, RefreshIcon, UserAddIcon } from '../common/Icons';
 import Button from './Button';
 
 interface PanelButtonsProps {
@@ -27,6 +27,7 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
     handleFileUpload,
     cargarDesdeBD,
     handleApiSync,
+    handleAddClient,
     handleSaveToDatabase,
     selectedRoute,
     setSelectedRoute,
@@ -69,10 +70,10 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                             <Button
                                 as="label"
                                 htmlFor="file-upload-panel"
-                                variant="verdeaqua"
+                                variant="ghost"
                                 size="sm"
                                 icon={<UploadIcon className="w-3 h-3" />}
-                                className="w-full sm:w-40 h-10 border-[#b2e1d8] text-[#b2e1d8]"
+                                className="w-full sm:w-40 h-10 shadow-md border border-[#453445]/20 text-[#162b25]"
                             >
                                 Subir
                             </Button>
@@ -88,6 +89,18 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
                             icon={<DatabaseIcon className="w-3 h-3" />}
                         >
                             {title ? 'Recargar Usuarios' : 'Recargar BD'}
+                        </Button>
+                    )}
+
+                    {handleAddClient && (
+                        <Button
+                            onClick={handleAddClient}
+                            variant="verdeaqua"
+                            size="sm"
+                            className="w-full sm:w-40 h-10 shadow-md border border-[#453445]/20 "
+                            icon={<UserAddIcon className="w-3 h-3" />}
+                        >
+                            {title ? 'Agregar Cliente' : 'Agregar Cliente'}
                         </Button>
                     )}
 
@@ -118,7 +131,7 @@ const PanelButtons: React.FC<PanelButtonsProps> = ({
 
                 {itemCount !== undefined && (
                     <div className="flex-shrink-0">
-                        <span className="text-[#b2e1d8]/60 text-xs font-mono px-3 py-1 bg-[#0f1f1b] rounded-full border border-[#b2e1d8]/10">
+                        <span className="text-[#bedacc] xs:text-xs sm:text-sm sm:px-4 xs:px-2 text-md font-bold px-6 py-4 bg-[#162b25] rounded-full border border-[#b2e1d8]/10">
                             {itemCount} {itemLabel}
                         </span>
                     </div>

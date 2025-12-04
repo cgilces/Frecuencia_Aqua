@@ -36,7 +36,7 @@ export const Table = <T extends any>({
     renderMobileItem
 }: TableProps<T>) => {
     return (
-        <Card className="overflow-hidden bg-[#ffffff] border-[#162b25]/30 shadow-[#162b25]/30">
+        <Card className="overflow-hidden bg-[#ffffff] border-[#162b25]/20 ">
             {/* VISTA MÓVIL */}
             <div className="md:hidden divide-y divide-[#b2e1d8]/10">
                 {renderMobileItem && data.map((item) => (

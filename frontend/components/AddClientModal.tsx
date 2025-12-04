@@ -10,9 +10,10 @@ interface AddClientModalProps {
     onClose: () => void;
     onAddClient: (clientData: RawClientData) => void;
     existingSessionId: string | null;
+    availableRoutes?: string[];
 }
 
-export const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose, onAddClient, existingSessionId }) => {
+export const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose, onAddClient, existingSessionId, availableRoutes = [] }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [selectedClient, setSelectedClient] = useState<any | null>(null);
@@ -51,13 +52,13 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose,
 
         if (!res.ok) throw new Error('Error de conexión al hacer login');
         const data = await res.json();
-        
+
         if (data.status === false || data.type === 'error') {
-             throw new Error(data.message || 'Error de credenciales en API');
+            throw new Error(data.message || 'Error de credenciales en API');
         }
-        
+
         if (!data.session_id) throw new Error('No se obtuvo session_id');
-        
+
         setLocalSessionId(data.session_id);
         return data.session_id;
     };
@@ -65,7 +66,7 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose,
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!searchTerm.trim()) return;
-        
+
         setIsLoading(true);
         setErrorMessage('');
         setSearchResults([]);
@@ -74,7 +75,7 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose,
 
         try {
             const sanitizedTerm = searchTerm.trim();
-            
+
             const { data, error } = await supabase
                 .from('api_customers')
                 .select('*')
@@ -88,7 +89,7 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose,
                 if (activeClients.length > 0) {
                     setSearchResults(activeClients);
                 } else {
-                     setErrorMessage('Se encontraron clientes, pero ninguno está activo.');
+                    setErrorMessage('Se encontraron clientes, pero ninguno está activo.');
                 }
             } else {
                 setErrorMessage('No se encontraron resultados en el catálogo local. Asegúrate de haber sincronizado.');
@@ -107,17 +108,17 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose,
         setIsLoading(true);
         setErrorMessage('');
         setLoadingProgress('Obteniendo dirección desde API...');
-        
+
         try {
             const sid = await handleLoginIfNeeded();
-            
+
             const addressBody = JSON.stringify({
                 "session_id": sid,
                 "action": "get",
                 "schema": "customer_addresses",
                 "page": 1,
                 "limit": 5,
-                "filter": `customer_code = '${client.code}'` 
+                "filter": `customer_code = '${client.code}'`
             });
 
             const res = await fetchWithCors('https://s31.mobilvendor.com/web-service', {
@@ -128,16 +129,16 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose,
 
             const addrData = await res.json();
             let address = null;
-            
+
             if (addrData.records && addrData.records.length > 0) {
                 address = addrData.records[0];
-            } 
+            }
 
             const fullClientData = {
                 ...client,
                 addressData: address
             };
-            
+
             setSelectedClient(fullClientData);
             setSelectedRoute('');
 
@@ -193,33 +194,33 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose,
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-[#19322f]/90 flex items-center justify-center z-50 backdrop-blur-sm p-4">
-            <div className="bg-[#19322f] w-full max-w-2xl rounded-xl border border-[#b2e1d8]/30 shadow-2xl flex flex-col max-h-[90vh]">
-                <div className="p-6 border-b border-[#b2e1d8]/20 flex justify-between items-center">
-                    <h2 className="text-xl font-bold text-[#b2e1d8]">Agregar Cliente (Catálogo Local)</h2>
+        <div className="fixed inset-0 bg-[#bedacc]/90 flex items-center justify-center z-50 backdrop-blur-sm p-4">
+            <div className="bg-[#16221f] w-full max-w-2xl rounded-xl border border-[#b2e1d8]/30 shadow-2xl flex flex-col max-h-[90vh]">
+                <div className="p-4 sm:p-6 border-b border-[#b2e1d8]/20 flex justify-between items-center">
+                    <h2 className="text-base sm:text-xl font-bold text-[#b2e1d8]">Agregar Cliente</h2>
                     <button onClick={handleClose} className="text-[#b2e1d8]/50 hover:text-[#b2e1d8]">
                         <XCircleIcon className="w-6 h-6" />
                     </button>
                 </div>
 
-                <div className="p-6 overflow-y-auto flex-1">
+                <div className="p-4 sm:p-6 overflow-y-auto flex-1">
                     {!selectedClient ? (
                         <>
-                            <form onSubmit={handleSearch} className="flex gap-2 mb-6">
+                            <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 mb-6">
                                 <input
                                     type="text"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="flex-1 bg-[#19322f] border border-[#b2e1d8]/40 text-[#b2e1d8] rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#b2e1d8] outline-none placeholder-[#b2e1d8]/30"
-                                    placeholder="Buscar por Nombre o RUC en base de datos..."
+                                    className="flex-1 bg-[#ffffff] border border-[#b2e1d8]/40 text-[#162b25] rounded-lg px-3 sm:px-4 py-2 focus:ring-2 focus:ring-[#b2e1d8] outline-none placeholder-[#162b25]/70 text-sm sm:text-base"
+                                    placeholder="Buscar por Nombre o RUC..."
                                 />
-                                <button 
-                                    type="submit" 
+                                <button
+                                    type="submit"
                                     disabled={isLoading}
-                                    className="bg-[#b2e1d8] hover:bg-[#9adfd3] text-[#19322f] px-4 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50 font-semibold"
+                                    className="bg-[#b2e1d8] hover:bg-[#bedacc] text-[#162b25] px-4 py-2 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 font-semibold w-full sm:w-auto"
                                 >
                                     {isLoading ? <Spinner /> : <SearchIcon className="w-5 h-5" />}
-                                    Buscar
+                                    <span>Buscar</span>
                                 </button>
                             </form>
 
@@ -237,10 +238,10 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose,
 
                             <div className="space-y-2">
                                 {searchResults.map(client => (
-                                    <div 
+                                    <div
                                         key={client.code}
                                         onClick={() => handleSelectClient(client)}
-                                        className="bg-[#b2e1d8]/5 hover:bg-[#b2e1d8]/10 p-3 rounded-lg cursor-pointer border border-[#b2e1d8]/20 transition-colors group"
+                                        className="bg-[#b2e1d8]/5 hover:bg-[#bedacc]/10 p-3 rounded-lg cursor-pointer border border-[#b2e1d8]/20 transition-colors group"
                                     >
                                         <div className="font-bold text-[#b2e1d8] group-hover:text-white">{client.name}</div>
                                         <div className="text-sm text-[#b2e1d8]/60 flex justify-between mt-1">
@@ -255,39 +256,44 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose,
                         <div className="space-y-4">
                             <div className="bg-[#19322f] p-4 rounded-lg border border-[#b2e1d8]/30">
                                 <h3 className="text-lg font-semibold text-[#b2e1d8] mb-2">{selectedClient.name}</h3>
-                                <div className="grid grid-cols-2 gap-4 text-sm text-[#b2e1d8]/80">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-sm text-[#b2e1d8]/80">
                                     <p><span className="text-[#b2e1d8]/50">RUC:</span> {selectedClient.identity_}</p>
                                     <p><span className="text-[#b2e1d8]/50">Teléfono:</span> {selectedClient.addressData?.phone || 'N/A'}</p>
-                                    <p className="col-span-2"><span className="text-[#b2e1d8]/50">Dirección:</span> {selectedClient.addressData?.address || 'Sin dirección registrada'}</p>
+                                    <p className="col-span-1 sm:col-span-2"><span className="text-[#b2e1d8]/50">Dirección:</span> {selectedClient.addressData?.address || 'Sin dirección registrada'}</p>
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-[#b2e1d8] mb-1">Asignar Ruta</label>
-                                <input
-                                    type="text"
+                                <label className="block text-sm font-medium text-[#b2e1d8] mb-1">Asignar Ruta *</label>
+                                <select
                                     value={selectedRoute}
                                     onChange={(e) => setSelectedRoute(e.target.value)}
                                     className="w-full bg-[#19322f] border border-[#b2e1d8]/40 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#b2e1d8] outline-none"
-                                    placeholder="Ej: R1, R2..."
-                                />
-                                <p className="text-xs text-[#b2e1d8]/50 mt-1">Escribe la ruta para este cliente.</p>
+                                >
+                                    <option value="">Seleccionar ruta...</option>
+                                    {availableRoutes.map(route => (
+                                        <option key={route} value={route}>
+                                            Ruta {route}
+                                        </option>
+                                    ))}
+                                </select>
+                                <p className="text-xs text-[#b2e1d8]/50 mt-1">Selecciona la ruta para este cliente.</p>
                             </div>
                         </div>
                     )}
                 </div>
 
-                <div className="p-6 border-t border-[#b2e1d8]/20 bg-[#19322f] rounded-b-xl flex justify-end gap-3">
-                    <button 
+                <div className="p-4 sm:p-6 border-t border-[#b2e1d8]/20 bg-[#16221f] rounded-b-xl flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
+                    <button
                         onClick={selectedClient ? () => setSelectedClient(null) : handleClose}
-                        className="px-4 py-2 text-[#b2e1d8] hover:text-white hover:bg-[#b2e1d8]/10 rounded-lg"
+                        className="px-4 py-2 text-[#b2e1d8] hover:text-white hover:bg-[#b2e1d8]/10 rounded-lg w-full sm:w-auto order-2 sm:order-1"
                     >
                         {selectedClient ? 'Volver a buscar' : 'Cancelar'}
                     </button>
                     {selectedClient && (
-                        <button 
+                        <button
                             onClick={handleConfirmAdd}
-                            className="bg-[#b2e1d8] hover:bg-[#9adfd3] text-[#19322f] px-6 py-2 rounded-lg font-bold"
+                            className="bg-[#b2e1d8] hover:bg-[#9adfd3] text-[#19322f] px-6 py-2 rounded-lg font-bold w-full sm:w-auto order-1 sm:order-2"
                         >
                             Agregar Cliente
                         </button>

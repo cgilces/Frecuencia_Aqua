@@ -32,8 +32,8 @@ export const Header: React.FC = () => {
             <Link
               to="/"
               className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${isActive('/')
-                ? 'bg-[#b2e1d8] text-[#162b25] shadow-lg'
-                : 'text-[#162b25] hover:bg-[#b2e1d8]/10'
+                ? 'bg-[#bedacc] text-[#162b25] shadow-lg'
+                : 'text-[#162b25] hover:bg-[#bedacc]/40'
                 }`}
             >
               Clientes
@@ -42,8 +42,8 @@ export const Header: React.FC = () => {
               <Link
                 to="/createuser"
                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${isActive('/createuser')
-                  ? 'bg-[#b2e1d8] text-[#162b25] shadow-lg'
-                  : 'text-[#162b25] hover:bg-[#b2e1d8]/10'
+                  ? 'bg-[#bedacc] text-[#162b25] shadow-lg'
+                  : 'text-[#162b25] hover:bg-[#bedacc]/40'
                   }`}
               >
                 Usuarios
@@ -54,9 +54,9 @@ export const Header: React.FC = () => {
           {/* Desktop User Info & Logout */}
           <div className="hidden md:flex items-center space-x-2 gap-4">
             <div className="flex items-center space-x-2">
-              <span className="text-[#b2e1d8] font-bold text-sm uppercase bg-[#b2e1d8]/10 px-2 py-0.5 rounded">{rol}</span>
-              <span className="text-[#b2e1d8]/40 text-sm">|</span>
-              <span className="text-[#162b25] text-sm font-medium">{user}</span>
+              <span className="text-[#162b25] font-bold text-sm uppercase bg-[#bedacc] px-2 py-0.5 rounded">{rol}</span>
+              <span className="text-[#162b25]/40 text-sm">|</span>
+              <span className="text-[#162b25] text-sm font-bold">{user}</span>
             </div>
             <button
               onClick={logout}
@@ -90,8 +90,8 @@ export const Header: React.FC = () => {
               to="/"
               onClick={() => setIsMenuOpen(false)}
               className={`px-4 py-3 rounded-lg font-medium text-center transition-all duration-200 ${isActive('/')
-                ? 'bg-[#b2e1d8] text-[#162b25]'
-                : 'text-[#162b25] hover:bg-[#b2e1d8]/10'
+                ? 'bg-[#bedacc] text-[#162b25]'
+                : 'text-[#162b25] hover:bg-[#bedacc]/40'
                 }`}
             >
               Clientes
@@ -112,7 +112,7 @@ export const Header: React.FC = () => {
 
           <div className="border-t border-[#b2e1d8]/20 pt-6 w-full max-w-xs flex flex-col gap-4">
             <div className="flex items-center justify-center gap-2">
-              <span className="text-[#b2e1d8] font-bold text-xs uppercase bg-[#b2e1d8]/10 px-3 py-1 rounded-full">{rol}</span>
+              <span className="text-[#162b25] font-bold text-xs uppercase bg-[#bedacc] px-3 py-1 rounded-full">{rol}</span>
               <span className="text-[#162b25] text-sm font-medium">{user}</span>
             </div>
             <button

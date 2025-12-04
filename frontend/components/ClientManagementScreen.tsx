@@ -14,6 +14,7 @@ import {
     UploadIcon, DownloadIcon
 } from './common/Icons';
 import Button from './elements/Button';
+import { AddClientModal } from './AddClientModal';
 
 declare const XLSX: any;
 
@@ -43,6 +44,8 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
     const [clients, setClients] = useState<DisplayClient[]>([]);
     const [selectedRoute, setSelectedRoute] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
     const [loadingMessage, setLoadingMessage] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -93,7 +96,14 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
 
         return 'custom';
     };
+    const handleAddClient = () => {
+        setIsAddModalOpen(true);
+    }
 
+
+    const handleAddNewClient = (newClient: DisplayClient) => {
+        setClients(prev => [...prev, newClient]);
+    };
     const handlePatternChange = (clientId: string, patternId: string) => {
         if (patternId === 'custom') return;
 
@@ -490,7 +500,7 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
                     type="checkbox"
                     checked={client.days?.[d as keyof typeof client.days] || false}
                     onChange={() => toggleDay(client.ruc, d)}
-                    className="w-4 h-4 accent-[#7cac3c]"
+                    className="w-4 h-4 accent-[#bedacc] focus:ring-[#bedacc] focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#162b25]"
                 />
             )
         };
@@ -621,7 +631,18 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
                 </div>
             )}
 
+            {/* ======================= MODAL AGREGAR CLIENTE ======================= */}
 
+
+            {isAddModalOpen && (
+                <AddClientModal
+                    isOpen={isAddModalOpen}
+                    onClose={() => setIsAddModalOpen(false)}
+                    onAddClient={handleAddNewClient}
+
+                    availableRoutes={uniqueRoutes}
+                />
+            )}
 
 
 
@@ -631,6 +652,7 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
                 isAdmin={true}
                 handleFileUpload={handleFileUpload}
                 handleApiSync={handleApiSync}
+                handleAddClient={handleAddClient}
                 handleSaveToDatabase={handleSaveToDatabase}
                 itemCount={filteredClients.length}
                 itemLabel={filteredClients.length === 1 ? 'cliente' : 'clientes'}
@@ -654,7 +676,7 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
 
             {/* ======================= PLANILLA EXPORTACIÓN ======================= */}
             {isAdmin && (
-                <Card className="p-6  border-[#b2e1d8]/20">
+                <Card className="p-6  border-[#162b25]/20">
 
                     <div className="flex justify-between mb-4">
                         <div>
@@ -670,7 +692,7 @@ const ClientManagementScreen: React.FC<Props> = ({ user }) => {
                             value="Exportar Excel"
                             onClick={handleDownloadExcel}
                             disabled={generatedSchedule.length === 0}
-                            className="bg-[#b2e1d8] hover:bg-[#9adfd3] text-[#19322f] px-4 py-2 rounded-lg font-bold"
+                            className="bg-[#bedacc] hover:bg-[#bedacc]/80 text-[#19322f] px-4 py-2 rounded-lg font-bold"
                         >
                             <DownloadIcon className="w-5 h-5" />
                             Exportar Excel
