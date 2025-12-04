@@ -64,7 +64,7 @@ export const LoginScreen: React.FC = () => {
                     <Button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#b2e1d8] hover:bg-[#9adfd3] disabled:opacity-70 text-[#19322f] border-[#162b25] border font-bold py-3 rounded-lg transition-colors flex justify-center items-center shadow-lg uppercase tracking-wider text-sm"
+                        className="w-full bg-[#b2e1d8] hover:bg-[#9adfd3] disabled:opacity-70 text-[#19322f]  border font-bold py-3 rounded-lg transition-colors flex justify-center items-center shadow-lg uppercase tracking-wider text-sm"
                     >
                         {loading ? <Spinner /> : 'Iniciar Sesión'}
                     </Button>
