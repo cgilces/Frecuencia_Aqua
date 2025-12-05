@@ -10,7 +10,17 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     port: process.env.DB_PUERTO,
     dialect: 'postgres',
-    logging: false
+    logging: false,
+
+    // 🔥 Ajuste de zona horaria para Ecuador
+    timezone: "-05:00",
+
+    // 🔥 Forzar timestamps a devolverlos como date local (opcional)
+    dialectOptions: {
+      useUTC: false,            // no usar UTC al leer
+      dateStrings: true,        // devolver string en vez de Date
+      typeCast: true            // convertir timezone correctamente
+    }
   }
 );
 

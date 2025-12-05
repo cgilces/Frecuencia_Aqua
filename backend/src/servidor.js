@@ -11,6 +11,8 @@ const mobilvendorRoutes = require('./rutas/mobilvendorRoutes');
 const login = require('./rutas/loginRoutes');
 const crearUsuario = require('./rutas/usuariosRoutes');
 const obtenerUsuarios = require('./rutas/usuariosRoutes');
+const clientesRoutes = require('./rutas/clientesRoutes');
+
 
 const movilvendorGetRoutes = require('./rutas/movilvendorGetRoutes');
 
@@ -26,6 +28,10 @@ app.use(express.json({ limit: '20mb' }));
 app.get('/', (req, res) => {
   res.json({ mensaje: 'API de Gestor de Rutas funcionando correctamente 🚀' });
 });
+
+// Rutas Clientes
+app.use('/api/clientes', clientesRoutes);
+
 
 // Rutas de autenticación / usuarios
 app.use('/api/login', login);
